@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La flotte Air France à travers les éphémérides</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+.viz-root {
+  color-scheme: light;
+  --page: #f9f9f7;
+  --surface-1: #fcfcfb;
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --text-muted: #898781;
+  --grid: #e1e0d9;
+  --baseline: #c3c2b7;
+  --hover: #f0efec;
+  --border: rgba(11,11,11,0.10);
+  /* Ordinal blue ramp: more mentions = darker; lightest step still clears 2:1 on the surface. */
+  --seq-1: #86b6ef; --seq-2: #5598e7; --seq-3: #2a78d6; --seq-4: #1c5cab; --seq-5: #0d366b;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) .viz-root {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface-1: #1a1a19;
+    --text-primary: #f0efec; --text-secondary: #c3c2b7;
+    --grid: #2c2c2a; --baseline: #383835; --hover: #262624;
+    --border: rgba(255,255,255,0.10);
+    --seq-1: #184f95; --seq-2: #256abf; --seq-3: #3987e5; --seq-4: #6da7ec; --seq-5: #b7d3f6;
+  }
+}
+:root[data-theme="dark"] .viz-root {
+  color-scheme: dark;
+  --page: #0d0d0d; --surface-1: #1a1a19;
+  --text-primary: #f0efec; --text-secondary: #c3c2b7;
+  --grid: #2c2c2a; --baseline: #383835; --hover: #262624;
+  --border: rgba(255,255,255,0.10);
+  --seq-1: #184f95; --seq-2: #256abf; --seq-3: #3987e5; --seq-4: #6da7ec; --seq-5: #b7d3f6;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+.viz-root {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--page); color: var(--text-primary);
+  min-height: 100vh; padding: 24px 32px 32px;
+}
+header h1 { font-size: 22px; font-weight: 600; margin: 0 0 4px; }
+header p { margin: 0; color: var(--text-secondary); font-size: 14px; }
+.note {
+  display: inline-block; margin-top: 10px; padding: 4px 10px; border-radius: 6px;
+  border: 1px solid var(--border); color: var(--text-secondary); font-size: 12px;
+}
+.controls { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin: 20px 0 12px; font-size: 14px; }
+select, button {
+  font: inherit; font-size: 14px; color: var(--text-primary);
+  background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px;
+}
+button { cursor: pointer; }
+button:hover { background: var(--hover); }
+.legend { display: flex; align-items: center; gap: 4px; color: var(--text-secondary); font-size: 13px; margin-left: auto; }
+.legend .sw { width: 14px; height: 10px; border-radius: 2px; display: inline-block; }
+.legend .lbl { margin: 0 8px 0 4px; font-variant-numeric: tabular-nums; }
+
+.card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+#chart { display: block; width: 100%; height: auto; }
+.lane-label { font-size: 12px; fill: var(--text-primary); }
+.lane-span { font-size: 11px; fill: var(--text-muted); font-variant-numeric: tabular-nums; }
+.axis text { font-size: 11px; fill: var(--text-muted); font-variant-numeric: tabular-nums; }
+.gridline { stroke: var(--grid); stroke-width: 1px; }
+.span-line { stroke: var(--baseline); stroke-width: 1px; }
+.lane-bg { fill: transparent; }
+.lane-bg.hover { fill: var(--hover); }
+.cell { rx: 2px; }
+.cell.active { stroke: var(--text-primary); stroke-width: 1.5px; }
+.hit { fill: transparent; cursor: pointer; }
+
+.tooltip {
+  position: fixed; pointer-events: none; z-index: 10; max-width: 320px;
+  background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
+  padding: 8px 10px; font-size: 13px; box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  opacity: 0; transition: opacity 80ms;
+}
+.tooltip .v { font-weight: 600; }
+.tooltip .s { color: var(--text-secondary); margin-top: 2px; }
+
+#detail { margin-top: 16px; }
+#detail h2 { font-size: 15px; margin: 0 0 8px; font-weight: 600; }
+.event { padding: 8px 0; border-top: 1px solid var(--grid); font-size: 13px; color: var(--text-secondary); line-height: 1.4; }
+.event .d { color: var(--text-primary); font-weight: 600; font-variant-numeric: tabular-nums; margin-right: 8px; }
+.empty { color: var(--text-muted); font-size: 13px; }
+
+#table-view { display: none; margin-top: 16px; }
+#table-view.open { display: block; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--grid); }
+th { color: var(--text-secondary); font-weight: 600; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<div class="viz-root">
+  <header>
+    <h1>La flotte Air France à travers les éphémérides</h1>
+    <p>Chaque case est une année où l'avion est mentionné ; plus la couleur est intense, plus il y a de mentions.</p>
+    <span class="note" id="note"></span>
+  </header>
+
+  <div class="controls">
+    <label>Trier par
+      <select id="sort">
+        <option value="first">première mention</option>
+        <option value="total">nombre de mentions</option>
+      </select>
+    </label>
+    <button id="table-toggle" aria-pressed="false">Vue tableau</button>
+    <div class="legend" id="legend" aria-label="Échelle : mentions par an"></div>
+  </div>
+
+  <div class="card">
+    <svg id="chart" role="img" aria-label="Frise chronologique des avions mentionnés par année"></svg>
+  </div>
+
+  <section class="card" id="detail" aria-live="polite">
+    <p class="empty">Cliquez sur une case pour lire les éphémérides de cette année.</p>
+  </section>
+
+  <section class="card" id="table-view">
+    <table>
+      <thead><tr><th>Avion</th><th class="num">1re mention</th><th class="num">Dernière</th><th class="num">Année record</th><th class="num">Mentions</th></tr></thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </section>
+  <div class="tooltip" id="tooltip" role="tooltip"></div>
+</div>
+
+<script>
+const DATA = /*__DATA__*/null;
+const el = id => document.getElementById(id);
+
+const lanes = DATA.lanes.map(l => {
+  const byYear = d3.rollup(l.events, v => v, e => +e.d.slice(0, 4));
+  const years = [...byYear.keys()].sort((a, b) => a - b);
+  const peak = d3.greatest(byYear, ([, v]) => v.length);
+  return { ...l, byYear, first: years[0], last: years[years.length - 1], total: l.events.length, peakYear: peak[0], peakCount: peak[1].length };
+});
+const totalMentions = d3.sum(lanes, l => l.total);
+el("note").textContent = `Données complètes : ${lanes.length} avions, ${totalMentions.toLocaleString("fr-FR")} mentions repérées par mots-clés dans tous les textes (sans IA)`;
+
+const maxCount = d3.max(lanes, l => l.peakCount);
+// Five ordered bins on a log-ish scale: most aircraft-years have few mentions.
+const thresholds = [2, 4, 8, 16].filter(t => t < maxCount);
+const bin = d3.scaleThreshold().domain(thresholds).range([1, 2, 3, 4, 5]);
+const binLabels = ["1"].concat(thresholds.map((t, i) => {
+  const lo = t, hi = (thresholds[i + 1] ?? (maxCount + 1)) - 1;
+  return lo === hi ? `${lo}` : i === thresholds.length - 1 ? `${lo}+` : `${lo}–${hi}`;
+}));
+if (thresholds[0] > 2) binLabels[0] = `1–${thresholds[0] - 1}`;
+const legend = el("legend");
+legend.append(Object.assign(document.createElement("span"), { textContent: "Mentions par an :", className: "lbl" }));
+binLabels.forEach((txt, i) => {
+  const sw = document.createElement("span"); sw.className = "sw"; sw.style.background = `var(--seq-${i + 1})`;
+  const lb = document.createElement("span"); lb.className = "lbl"; lb.textContent = txt;
+  legend.append(sw, lb);
+});
+
+const minYear = Math.floor(d3.min(lanes, l => l.first) / 10) * 10;
+const maxYear = DATA.maxYear;
+const LABEL_W = 180, SPAN_W = 80, LANE_H = 26, CELL_H = 16, TOP = 28;
+const W = 1200;
+const x = d3.scaleBand().domain(d3.range(minYear, maxYear + 1)).range([LABEL_W, W - SPAN_W]).paddingInner(0);
+const svg = d3.select("#chart");
+let selected = null;
+
+const tip = el("tooltip");
+function showTip(ev, lane, yr, events) {
+  tip.replaceChildren();
+  const v = document.createElement("div"); v.className = "v";
+  v.textContent = `${events.length} mention${events.length > 1 ? "s" : ""}`;
+  const s = document.createElement("div"); s.className = "s"; s.textContent = `${lane.name} · ${yr}`;
+  const t = document.createElement("div"); t.className = "s"; t.textContent = events[0].t;
+  tip.append(v, s, t);
+  moveTip(ev); tip.style.opacity = 1;
+}
+function moveTip(ev) {
+  tip.style.left = `${Math.min(ev.clientX + 14, window.innerWidth - 340)}px`;
+  tip.style.top = `${ev.clientY + 14}px`;
+}
+
+function showDetail(lane, yr) {
+  selected = `${lane.name}|${yr}`;
+  svg.selectAll(".cell").classed("active", d => `${d.lane.name}|${d.yr}` === selected);
+  const box = el("detail"); box.replaceChildren();
+  const h = document.createElement("h2"); h.textContent = `${lane.name} en ${yr}`;
+  box.append(h);
+  for (const e of lane.byYear.get(yr)) {
+    const div = document.createElement("div"); div.className = "event";
+    const d = document.createElement("span"); d.className = "d"; d.textContent = new Date(e.d).toLocaleDateString("fr-FR");
+    div.append(d, document.createTextNode(e.t));
+    box.append(div);
+  }
+}
+
+function render() {
+  const order = el("sort").value;
+  const sorted = [...lanes].sort(order === "total" ? (a, b) => b.total - a.total : (a, b) => a.first - b.first || b.total - a.total);
+  const H = TOP + sorted.length * LANE_H + 8;
+  svg.attr("viewBox", `0 0 ${W} ${H}`).selectAll("*").remove();
+
+  const decades = d3.range(Math.ceil(minYear / 10) * 10, maxYear + 1, 10);
+  const axis = svg.append("g").attr("class", "axis");
+  axis.selectAll("line").data(decades).join("line").attr("class", "gridline")
+    .attr("x1", d => x(d)).attr("x2", d => x(d)).attr("y1", TOP - 6).attr("y2", H - 4);
+  axis.selectAll("text").data(decades).join("text")
+    .attr("x", d => x(d)).attr("y", TOP - 12).attr("text-anchor", "middle").text(d => d);
+
+  const lane = svg.selectAll(".lane").data(sorted, d => d.name).join("g").attr("class", "lane")
+    .attr("transform", (d, i) => `translate(0, ${TOP + i * LANE_H})`);
+  lane.append("rect").attr("class", "lane-bg").attr("x", 0).attr("width", W).attr("height", LANE_H);
+  lane.append("text").attr("class", "lane-label").attr("x", LABEL_W - 12).attr("y", LANE_H / 2)
+    .attr("dy", "0.35em").attr("text-anchor", "end").text(d => d.name);
+  lane.append("line").attr("class", "span-line")
+    .attr("x1", d => x(d.first)).attr("x2", d => x(d.last) + x.bandwidth())
+    .attr("y1", LANE_H / 2).attr("y2", LANE_H / 2);
+  lane.append("text").attr("class", "lane-span").attr("x", W - SPAN_W + 10).attr("y", LANE_H / 2)
+    .attr("dy", "0.35em").text(d => d.first === d.last ? `${d.first}` : `${d.first}–${d.last}`);
+
+  const cellW = Math.max(2, x.bandwidth() - 2);  // 2px surface gap between adjacent years
+  lane.each(function (l) {
+    const cells = [...l.byYear].map(([yr, events]) => ({ lane: l, yr, events }));
+    const g = d3.select(this);
+    g.selectAll(".cell").data(cells).join("rect")
+      .attr("class", d => `cell${`${l.name}|${d.yr}` === selected ? " active" : ""}`)
+      .attr("x", d => x(d.yr) + 1).attr("y", (LANE_H - CELL_H) / 2)
+      .attr("width", cellW).attr("height", CELL_H)
+      .attr("fill", d => `var(--seq-${bin(d.events.length)})`);
+    // Hit target: the whole year column of the lane, not only the painted cell.
+    g.selectAll(".hit").data(cells).join("rect").attr("class", "hit")
+      .attr("x", d => x(d.yr) - 2).attr("y", 0).attr("width", x.bandwidth() + 4).attr("height", LANE_H)
+      .on("pointerenter", (ev, d) => { g.select(".lane-bg").classed("hover", true); showTip(ev, l, d.yr, d.events); })
+      .on("pointermove", moveTip)
+      .on("pointerleave", () => { g.select(".lane-bg").classed("hover", false); tip.style.opacity = 0; })
+      .on("click", (ev, d) => showDetail(l, d.yr));
+  });
+}
+
+function renderTable() {
+  el("table-body").replaceChildren(...[...lanes].sort((a, b) => a.first - b.first).map(l => {
+    const tr = document.createElement("tr");
+    for (const [v, num] of [[l.name], [l.first, 1], [l.last, 1], [`${l.peakYear} (${l.peakCount})`, 1], [l.total, 1]]) {
+      const td = document.createElement("td"); td.textContent = v; if (num) td.className = "num"; tr.append(td);
+    }
+    return tr;
+  }));
+}
+
+el("sort").addEventListener("change", render);
+el("table-toggle").addEventListener("click", ev => {
+  const open = el("table-view").classList.toggle("open");
+  ev.currentTarget.setAttribute("aria-pressed", open);
+  if (open) el("table-view").scrollIntoView({ behavior: "smooth" });
+});
+renderTable();
+render();
+</script>
+</body>
+</html>

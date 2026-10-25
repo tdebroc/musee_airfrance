@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+*.pyc
+*.log
+.agent.pid
+.DS_Store
+scratch/

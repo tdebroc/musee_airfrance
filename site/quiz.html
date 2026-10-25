@@ -1,0 +1,685 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Le Grand Quiz — Musée Air France</title><style>
+:root { --bg:#f1ede6; --card:#fffdf9; --ink:#1c2230; --muted:#5d6574; --line:#e0dacf; --accent:#002157; --accent2:#d4001a;
+  --mu-sign:#1d232c; --mu-sign-ink:#ffd200; --mu-grass:#dde5d1; --mu-apron:#cfd4da; --mu-runway:#59606b; --mu-build:#f8f6f2;
+  --mu-wall:#9aa3ae; --mu-room:#ffffff; --mu-floor:#e2dbcf; --mu-board:#0c0f14; }
+@media (prefers-color-scheme: dark) { :root { --bg:#12161d; --card:#1a1f29; --ink:#e8ebf1; --muted:#9aa3b2; --line:#2b3340; --accent:#8fb5ff; --accent2:#ff6b7a;
+  --mu-sign:#0a0d12; --mu-grass:#141c17; --mu-apron:#222831; --mu-runway:#363d48; --mu-build:#2c333e; --mu-wall:#566070; --mu-room:#1e2531; --mu-floor:#0e1117; } }
+* { box-sizing:border-box; }
+html { background:var(--bg); }
+body { margin:0; font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--ink);
+  background:radial-gradient(1200px 380px at 50% -120px, color-mix(in srgb, #fff 55%, transparent), transparent 70%), var(--bg); min-height:100vh; }
+@media (prefers-color-scheme: dark) { body { background:radial-gradient(1200px 380px at 50% -120px, #ffffff14, transparent 70%), var(--bg); } }
+a { color:var(--accent); }
+.card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px; }
+@view-transition { navigation:auto; }
+::view-transition-old(root) { animation:.32s ease both mu-out; } ::view-transition-new(root) { animation:.38s ease both mu-in; }
+@keyframes mu-out { to { opacity:0; transform:scale(1.03); } } @keyframes mu-in { from { opacity:0; transform:scale(.98); } }
+@media (prefers-reduced-motion: reduce) { ::view-transition-old(root), ::view-transition-new(root) { animation:none; } .mu-traffic { display:none; } }
+
+/* airport signage */
+.mu-sign { view-transition-name:mu-sign; position:sticky; top:0; z-index:20; display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+  padding:9px 20px; background:var(--mu-sign); color:var(--mu-sign-ink); font-weight:600; letter-spacing:.02em; box-shadow:0 2px 10px #0004; }
+.mu-sign a, .mu-sign .mu-btn { color:var(--mu-sign-ink); text-decoration:none; }
+.mu-sign .mu-logo { font-weight:800; font-size:16px; white-space:nowrap; }
+.mu-sign .mu-logo i { font-style:normal; display:inline-block; transform:rotate(-45deg); margin-right:6px; }
+.mu-sign .mu-where { display:flex; align-items:center; gap:10px; color:#fff; font-weight:500; min-width:0; }
+.mu-gate { display:inline-grid; place-items:center; min-width:34px; height:28px; padding:0 7px; border-radius:6px; background:var(--w, var(--accent)); color:#fff; font-weight:800; }
+.mu-sign .mu-gate { background:var(--mu-sign-ink); color:var(--mu-sign); }
+.mu-sign nav { margin-left:auto; min-width:0; display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+.mu-sign nav a, .mu-sign .mu-btn { font:600 14px system-ui,sans-serif; padding:5px 11px; border:1px solid #ffffff2e; border-radius:6px; background:transparent; cursor:pointer; white-space:nowrap; }
+.mu-sign nav a:hover, .mu-sign .mu-btn:hover { background:#ffffff1a; }
+.mu-sign .mu-pass { font-size:13px; color:#cfd6e2; font-weight:500; white-space:nowrap; }
+.mu-sign .mu-pass b { color:var(--mu-sign-ink); }
+
+/* a room */
+.mu-wall { max-width:1280px; margin:0 auto; padding:26px 22px 10px; }
+.mu-cartel { display:flex; gap:18px; align-items:stretch; margin:0 0 22px; }
+.mu-thumb { flex:0 0 280px; padding:6px; border:1px solid var(--line); border-radius:10px; background:var(--card); cursor:pointer; display:flex; flex-direction:column; gap:4px;
+  color:var(--muted); font:600 12px system-ui,sans-serif; letter-spacing:.06em; text-transform:uppercase; box-shadow:0 10px 28px -18px #0008; }
+.mu-thumb:hover { border-color:var(--accent); color:var(--ink); } .mu-thumb .mu-plan { border-radius:6px; }
+@media (max-width:900px) { .mu-thumb { display:none; } }
+.mu-plaque { flex:1; background:var(--card); border:1px solid var(--line); border-left:6px solid var(--w); border-radius:4px 10px 10px 4px;
+  padding:16px 22px; box-shadow:0 10px 28px -18px #0008; }
+.mu-kicker { margin:0 0 4px; font-size:12.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); font-weight:600; }
+.mu-plaque h1 { margin:0 0 6px; font:700 30px/1.15 Georgia,"Iowan Old Style","Times New Roman",serif; }
+.mu-plaque .lead { margin:0; color:var(--muted); max-width:80ch; }
+.mu-vitrine { position:relative; padding:22px; border-radius:14px; border:1px solid var(--line);
+  background:linear-gradient(180deg, color-mix(in srgb, var(--card) 70%, transparent), color-mix(in srgb, var(--card) 35%, transparent));
+  box-shadow:0 30px 60px -40px #0009, inset 0 1px 0 #ffffff40; }
+.mu-vitrine::before { content:""; position:absolute; inset:-26px 8% auto; height:26px; pointer-events:none;
+  background:radial-gradient(closest-side, color-mix(in srgb, #ffe9a8 60%, transparent), transparent); opacity:.7; }
+.mu-doors { max-width:1280px; margin:0 auto; padding:18px 22px 30px; display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:end; }
+.mu-door { display:flex; flex-direction:column; gap:2px; padding:22px 18px 14px; min-height:112px; justify-content:flex-end; text-decoration:none; color:var(--ink);
+  background:linear-gradient(180deg, color-mix(in srgb, var(--w) 20%, var(--card)), var(--card)); border:2px solid color-mix(in srgb, var(--w) 45%, var(--line));
+  border-bottom-width:6px; border-radius:60px 60px 6px 6px; transition:border-color .15s, box-shadow .15s; }
+.mu-door:hover { border-color:var(--w); box-shadow:0 12px 26px -16px var(--w); }
+.mu-door small { color:var(--muted); font-weight:600; letter-spacing:.05em; text-transform:uppercase; font-size:12px; }
+.mu-door b { font-size:16px; }
+.mu-door.next { text-align:right; } .mu-door.off { visibility:hidden; }
+.mu-hallbtn { display:grid; place-items:center; gap:4px; text-decoration:none; color:var(--ink); font-weight:600; padding:10px 18px; }
+.mu-hallbtn span { display:grid; place-items:center; width:46px; height:46px; border-radius:50%; background:var(--mu-sign); color:var(--mu-sign-ink); font-size:22px; }
+@media (max-width:760px) { .mu-doors { grid-template-columns:1fr 1fr; } .mu-hallbtn { grid-column:1 / -1; order:3; } .mu-plaque h1 { font-size:24px; } }
+.mu-foot { text-align:center; color:var(--muted); font-size:12.5px; padding:16px; border-top:1px solid var(--line); background:var(--mu-floor); }
+
+/* plan drawer in the rooms */
+.mu-drawer { position:fixed; inset:0; z-index:40; background:#0009; display:grid; place-items:start center; padding:70px 16px 16px; overflow:auto; }
+.mu-drawer[hidden] { display:none; }
+.mu-drawer-box { width:min(1180px, 100%); background:var(--card); border-radius:14px; padding:18px; box-shadow:0 30px 80px #0008; }
+.mu-drawer-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-weight:700; font-size:18px; }
+.mu-close { font:600 14px system-ui,sans-serif; padding:6px 12px; border:1px solid var(--line); border-radius:6px; background:var(--card); color:var(--ink); cursor:pointer; }
+.mu-legend { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:4px 18px; margin-top:12px; font-size:14px; }
+.mu-legend a { display:flex; gap:8px; align-items:center; text-decoration:none; color:var(--ink); padding:3px 0; }
+.mu-legend a:hover b { text-decoration:underline; } .mu-legend .mu-gate { min-width:30px; height:22px; font-size:12px; }
+.mu-legend a.mu-cur b { color:var(--accent2); }
+.mu-legend a.mu-done::after { content:"✓"; color:#2e9e5b; font-weight:700; }
+
+/* the plan */
+.mu-plan { display:block; width:100%; height:auto; }
+.mu-plan .mu-grass { fill:var(--mu-grass); } .mu-plan .mu-apron { fill:var(--mu-apron); }
+.mu-plan .mu-runway { fill:var(--mu-runway); } .mu-plan .mu-rwline { stroke:#fff; stroke-width:3; stroke-dasharray:30 24; opacity:.75; }
+.mu-plan text.mu-rwnum { fill:#fff; font:700 18px system-ui,sans-serif; opacity:.8; }
+.mu-plan .mu-build { fill:var(--mu-build); stroke:var(--mu-wall); stroke-width:2; }
+.mu-plan .mu-glass { fill:color-mix(in srgb, #4aa3df 35%, var(--mu-build)); }
+.mu-plan .mu-leadin { stroke:#e9b900; stroke-width:2.5; stroke-dasharray:10 7; }
+.mu-plan .mu-tip { fill:var(--mu-sign); stroke:var(--w); stroke-width:3; }
+.mu-plan text.mu-signletter { fill:var(--mu-sign-ink); font:800 24px system-ui,sans-serif; text-anchor:middle; dominant-baseline:central; }
+.mu-plan .mu-parked, .mu-plan .mu-moving { fill:#fbfbfd; stroke:#7d8693; stroke-width:1.4; }
+.mu-plan .mu-tail { fill:var(--w); }
+.mu-plan text.mu-wn { fill:var(--ink); font:800 17px system-ui,sans-serif; }
+.mu-plan text.mu-ws { fill:var(--muted); font:600 13px system-ui,sans-serif; letter-spacing:.06em; }
+.mu-plan text.mu-entry { fill:var(--accent2); font:800 15px system-ui,sans-serif; letter-spacing:.2em; }
+.mu-plan .mu-arrow { fill:none; stroke:var(--accent2); stroke-width:3; stroke-linecap:round; stroke-linejoin:round; }
+.mu-plan .mu-bridge { fill:none; stroke:var(--mu-wall); stroke-width:16; stroke-linejoin:round; }
+.mu-plan .mu-concorde { fill:#fbfbfd; stroke:#7d8693; stroke-width:1.6; }
+.mu-plan .mu-fin { stroke:#7d8693; stroke-width:3; } .mu-plan .mu-window { fill:#7fa6c9; }
+.mu-plan text.mu-reg { fill:#7d8693; font:700 12px system-ui,sans-serif; letter-spacing:.2em; }
+.mu-plan .mu-cabin { fill:var(--w); opacity:0; transition:opacity .15s; }
+.mu-plan .mu-leader { stroke:var(--w); stroke-width:1.5; stroke-dasharray:4 4; }
+.mu-plan .mu-room { cursor:pointer; outline:none; }
+.mu-plan .mu-roombox { fill:var(--mu-room); stroke:var(--mu-wall); stroke-width:1.5; transition:fill .15s, stroke .15s; }
+.mu-plan a.mu-room:hover .mu-roombox, .mu-plan a.mu-room:focus-visible .mu-roombox { fill:color-mix(in srgb, var(--w) 16%, var(--mu-room)); stroke:var(--w); stroke-width:3.5; }
+.mu-plan a.mu-room:hover .mu-cabin, .mu-plan a.mu-room:focus-visible .mu-cabin, .mu-plan .mu-here .mu-cabin { opacity:.55; }
+.mu-plan a.mu-room:focus-visible .mu-roombox { stroke-width:5; }
+.mu-plan .mu-badge { fill:var(--w); }
+.mu-plan text.mu-c { fill:#fff; font:800 13px system-ui,sans-serif; text-anchor:middle; dominant-baseline:central; pointer-events:none; }
+.mu-plan text.mu-cbig { font-size:24px; }
+.mu-plan text.mu-t { fill:var(--ink); font:600 14.5px system-ui,sans-serif; dominant-baseline:central; pointer-events:none; }
+.mu-plan text.mu-sub { fill:var(--w); font-size:12px; text-transform:uppercase; letter-spacing:.08em; font-weight:800; }
+.mu-plan text.mu-info-i { fill:var(--w); font:italic 800 30px Georgia,serif; text-anchor:middle; dominant-baseline:central; pointer-events:none; }
+.mu-plan .mu-here .mu-roombox { fill:var(--w); stroke:var(--w); }
+.mu-plan .mu-here .mu-badge { fill:#fff; } .mu-plan .mu-here text.mu-c { fill:var(--w); } .mu-plan .mu-here text.mu-info-i { fill:#fff; }
+.mu-plan a.mu-closed { cursor:not-allowed; opacity:.45; }
+.mu-plan .mu-seen { display:none; } .mu-plan .seen .mu-seen { display:inline; }
+.mu-plan .mu-seen circle { fill:#2e9e5b; } .mu-plan .mu-seen path { fill:none; stroke:#fff; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
+.mu-plan .mu-me { pointer-events:none; } .mu-plan .mu-dot { fill:var(--accent2); stroke:#fff; stroke-width:3; }
+.mu-plan .mu-halo { fill:var(--accent2); opacity:.25; transform-box:fill-box; transform-origin:center; animation:mu-pulse 1.8s ease-out infinite; }
+@keyframes mu-pulse { from { transform:scale(.5); opacity:.45; } to { transform:scale(1.6); opacity:0; } }
+@media (prefers-reduced-motion: reduce) { .mu-plan .mu-halo { animation:none; } }
+
+/* home */
+.mu-home { max-width:1820px; margin:0 auto; padding:22px; }
+.mu-hero { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:24px; align-items:center; margin-bottom:18px; }
+.mu-hero h1 { margin:0 0 6px; font:700 40px/1.1 Georgia,"Iowan Old Style","Times New Roman",serif; }
+.mu-hero p.mu-lead { margin:0; color:var(--muted); font-size:16.5px; max-width:78ch; }
+.mu-ticket { display:grid; grid-template-columns:auto auto; border-radius:12px; overflow:hidden; box-shadow:0 18px 40px -24px #000a; min-width:360px; }
+.mu-ticket > div { padding:14px 18px; background:var(--card); }
+.mu-ticket .mu-stub { background:#002157; color:#fff; border-left:2px dashed #ffffff80; display:grid; place-items:center; text-align:center; gap:6px; }
+.mu-ticket .mu-stub a { color:#002157; background:#fff; padding:6px 12px; border-radius:6px; font-weight:700; text-decoration:none; white-space:nowrap; }
+.mu-ticket small { display:block; color:var(--muted); font-size:11px; letter-spacing:.08em; text-transform:uppercase; font-weight:700; }
+.mu-ticket .mu-stub small { color:#ffffffb0; }
+.mu-ticket .mu-big { font-size:22px; font-weight:800; }
+.mu-stamps { display:flex; gap:3px; margin-top:8px; flex-wrap:wrap; max-width:260px; }
+.mu-stamps i { width:12px; height:12px; border-radius:3px; background:var(--line); } .mu-stamps i.on { background:var(--w); }
+.mu-planwrap { position:relative; border-radius:16px; overflow:hidden; border:1px solid var(--line); box-shadow:0 30px 60px -40px #000a; }
+.mu-info { position:absolute; left:16px; bottom:16px; width:min(380px, calc(100% - 32px)); background:color-mix(in srgb, var(--card) 94%, transparent);
+  border:1px solid var(--line); border-left:6px solid var(--w, var(--accent)); border-radius:10px; padding:12px 14px; box-shadow:0 12px 30px -14px #0008; backdrop-filter:blur(6px); }
+.mu-info b { display:block; font-size:17px; margin:4px 0 2px; } .mu-info p { margin:0 0 8px; color:var(--muted); font-size:13.5px; }
+.mu-info a { font-weight:700; } .mu-info small { color:var(--muted); font-weight:600; margin-left:6px; }
+.mu-hint { color:var(--muted); font-size:13.5px; margin:10px 2px 26px; }
+.mu-board { background:var(--mu-board); color:#ffd200; border-radius:14px; padding:14px 18px 18px; box-shadow:0 20px 50px -30px #000; overflow-x:auto; }
+.mu-board h2 { margin:2px 0 10px; font:800 20px system-ui,sans-serif; letter-spacing:.12em; color:#fff; display:flex; gap:12px; align-items:center; }
+.mu-board h2 span { color:#ffd200; }
+.mu-board table { width:100%; border-collapse:separate; border-spacing:0 4px; font:600 15px ui-monospace,"SF Mono",Menlo,Consolas,monospace; text-transform:uppercase; }
+.mu-board th { text-align:left; color:#8a93a3; font-size:12px; letter-spacing:.12em; padding:0 10px; }
+.mu-board td { background:#1a1f28; padding:7px 10px; white-space:nowrap; }
+.mu-board tr td:first-child { border-radius:4px 0 0 4px; } .mu-board tr td:last-child { border-radius:0 4px 4px 0; }
+.mu-board tbody tr { cursor:pointer; } .mu-board tbody tr:hover td { background:#262d39; }
+.mu-board a { color:#ffd200; text-decoration:none; } .mu-board td.mu-dest { white-space:normal; min-width:240px; }
+.mu-board .mu-st { color:#3ddc84; } .mu-board .mu-st.done { color:#9aa3b2; } .mu-board .mu-st.ko { color:#ff6b7a; }
+.mu-board .mu-st.go::before { content:"● "; animation:mu-blink 1.2s steps(2) infinite; }
+@keyframes mu-blink { 50% { opacity:.2; } }
+@media (max-width:900px) { .mu-hero { grid-template-columns:minmax(0,1fr); } .mu-ticket { min-width:0; grid-template-columns:minmax(0,1fr); }
+  .mu-ticket .mu-stub { border-left:0; border-top:2px dashed #ffffff80; } .mu-hero h1 { font-size:30px; } .mu-info { position:static; width:auto; border-radius:0; } }
+@media (max-width:600px) { .mu-sign { padding:8px 12px; gap:6px 10px; } .mu-sign nav { margin-left:0; } .mu-sign .mu-where > span { display:none; }
+  .mu-home, .mu-wall { padding-left:12px; padding-right:12px; } .mu-vitrine { padding:10px; } }
+</style><script src="https://cdn.jsdelivr.net/npm/d3@7"></script><style>
+.hidden { display:none !important; }
+.muted { color:var(--muted); }
+button { font:inherit; cursor:pointer; }
+button.go { padding:8px 20px; border:0; border-radius:6px; background:var(--accent); color:var(--bg); font-weight:600; }
+button.go:disabled { opacity:.4; cursor:default; }
+button.alt { padding:7px 14px; border:1px solid var(--line); border-radius:6px; background:var(--card); color:var(--ink); }
+button.alt:hover { border-color:var(--accent); }
+input[type=text], input[type=number] { font:inherit; padding:8px 10px; border:1px solid var(--line); border-radius:6px; background:var(--card); color:var(--ink); }
+.levels { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:14px 0; }
+.lvl { text-align:left; padding:14px; border:2px solid var(--line); border-radius:10px; background:var(--card); color:var(--ink); }
+.lvl:hover { border-color:var(--accent); }
+.lvl.on { border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
+.lvl b { font-size:18px; display:block; } .lvl span { display:block; color:var(--muted); font-size:13px; margin-top:4px; }
+.rules { color:var(--muted); font-size:13.5px; margin:8px 0 0; padding-left:18px; }
+.who { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:12px 0; }
+.bar { display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; font-size:14px; color:var(--muted); margin-bottom:8px; }
+.bar b { color:var(--ink); }
+.chip { display:inline-block; padding:1px 10px; border-radius:99px; background:color-mix(in srgb, var(--accent) 14%, transparent); color:var(--accent); font-weight:600; font-size:13px; }
+.timer { height:8px; border-radius:4px; background:var(--line); overflow:hidden; }
+.timer i { display:block; height:100%; width:100%; background:var(--accent); transition:none; }
+.timer i.low { background:var(--accent2); }
+.pot { font-size:13px; color:var(--muted); margin:4px 0 12px; text-align:right; }
+.ask { font-size:19px; margin:6px 0 12px; line-height:1.4; }
+.txt { font-size:16.5px; line-height:1.6; white-space:pre-wrap; margin:0 0 14px; padding:12px 14px; border-left:3px solid var(--accent); background:color-mix(in srgb, var(--accent) 6%, transparent); }
+.row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+.mapwrap { position:relative; border:1px solid var(--line); border-radius:8px; overflow:hidden; background:color-mix(in srgb, var(--accent) 8%, var(--card)); }
+.mapwrap svg { display:block; width:100%; height:auto; cursor:crosshair; touch-action:none; }
+.mapbtns { position:absolute; top:8px; right:8px; display:flex; flex-direction:column; gap:4px; }
+.mapbtns button { width:30px; height:30px; border:1px solid var(--line); border-radius:6px; background:var(--card); color:var(--ink); }
+.land { fill:color-mix(in srgb, var(--muted) 24%, var(--card)); stroke:var(--card); stroke-width:.6; vector-effect:non-scaling-stroke; }
+.sphere { fill:none; } .grat { fill:none; stroke:var(--line); stroke-width:.4; vector-effect:non-scaling-stroke; }
+.pin { fill:var(--accent); stroke:#fff; } .truth { fill:var(--accent2); stroke:#fff; } .link { stroke:var(--accent2); fill:none; stroke-dasharray:5 4; vector-effect:non-scaling-stroke; stroke-width:2; }
+.yearbig { font-size:34px; font-weight:700; color:var(--accent); min-width:90px; }
+input[type=range] { flex:1 1 320px; accent-color:var(--accent); }
+.cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:10px; margin-bottom:12px; }
+.ocard { position:relative; text-align:left; padding:12px 12px 12px 44px; border:2px solid var(--line); border-radius:8px; background:var(--card); color:var(--ink); min-height:64px; }
+.ocard:hover { border-color:var(--accent); }
+.ocard .n { position:absolute; left:10px; top:50%; transform:translateY(-50%); width:26px; height:26px; border-radius:50%; background:var(--line); color:var(--muted); display:grid; place-items:center; font-weight:700; }
+.ocard.picked { border-color:var(--accent); } .ocard.picked .n { background:var(--accent); color:var(--bg); }
+.ocard.ok { border-color:#2e9e5b; } .ocard.ko { border-color:var(--accent2); }
+.ocard small { display:block; color:var(--muted); margin-top:2px; }
+.shake { animation:shake .3s; } @keyframes shake { 25% { transform:translateX(-6px); } 75% { transform:translateX(6px); } }
+.reveal { margin-top:16px; padding:14px; border-radius:8px; background:color-mix(in srgb, var(--accent) 7%, transparent); }
+.reveal .pts { font-size:30px; font-weight:800; color:var(--accent); }
+.reveal .det { color:var(--muted); font-size:13.5px; margin:2px 0 8px; }
+.reveal .src { font-size:13px; color:var(--muted); margin:8px 0; border-left:3px solid var(--line); padding-left:10px; white-space:pre-wrap; }
+.reveal .good { color:var(--accent2); font-weight:700; }
+.final { font-size:46px; font-weight:800; color:var(--accent); line-height:1.1; }
+table.t { border-collapse:collapse; width:100%; font-size:14px; }
+table.t th, table.t td { text-align:left; padding:6px 10px; border-bottom:1px solid var(--line); }
+table.t td.n, table.t th.n { text-align:right; font-variant-numeric:tabular-nums; }
+table.t tr.me { background:color-mix(in srgb, var(--accent) 14%, transparent); font-weight:600; }
+.tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+.tabs button { padding:5px 14px; border:1px solid var(--line); border-radius:99px; background:var(--card); color:var(--ink); }
+.tabs button.on { background:var(--accent); color:var(--bg); border-color:var(--accent); }
+.board { margin-top:20px; }
+.note { color:var(--muted); font-size:12.5px; margin-top:10px; }
+</style></head><body><header class="mu-sign"><a class="mu-logo" href="index.html"><i>✈</i>Musée Air France</a><span class="mu-where"><b class="mu-gate">K1</b><span>Porte K · À bord du Concorde</span></span><nav><a href="barometre-crises.html" title="Baromètre des crises">← D2</a><a href="index.html" title="Retour au hall et au plan">Hall</a><button class="mu-btn" id="mu-plan-btn" aria-expanded="false" aria-controls="mu-drawer" title="Plan du musée (touche P)">Plan</button><a href="devine-annee.html" title="Devine l&#x27;année">K2 →</a></nav><span class="mu-pass" title="Salles visitées dans ce navigateur">Carte d'embarquement : <b data-mu-visits>0</b></span></header><div class="mu-wall"><section class="mu-cartel"><div class="mu-plaque" style="--w:#6a4cb5"><p class="mu-kicker">Cabine avant · Porte K — À bord du Concorde · salle 14 sur 16</p><h1>Le Grand Quiz</h1><p class="lead">116 questions tirées des éphémérides, trois niveaux, cinq façons de répondre. Plus tu réponds vite, plus tu marques : jusqu'à 5 000 points par question.</p></div><button class="mu-thumb" data-mu-plan title="Ouvrir le plan du musée (touche P)"><svg class="mu-plan mu-mini" viewBox="0 0 1760 1000" role="img" aria-label="Plan du musée"><rect class="mu-grass" width="1760" height="1000"/><rect class="mu-apron" x="20" y="64" width="1720" height="872" rx="34"/><rect class="mu-runway" x="40" y="14" width="1680" height="40" rx="4"/><line class="mu-rwline" x1="90" y1="34" x2="1670" y2="34"/><rect class="mu-runway" x="40" y="946" width="1680" height="40" rx="4"/><line class="mu-rwline" x1="90" y1="966" x2="1670" y2="966"/><line class="mu-leadin" x1="330" y1="200.0" x2="330" y2="54.0"/><rect class="mu-build" x="311.0" y="198.0" width="38" height="248.0"/><g style="--w:#1f5fbf"><circle class="mu-tip" cx="330" cy="200.0" r="24"/><text class="mu-signletter" x="330" y="200.0">A</text></g><path class="mu-parked" d="M0,-50C3.5,-47 5,-40 5,-32L5,-8L46,12L46,18L5,8L5,32L17,42L17,47L3,44L0,50L-3,44L-17,47L-17,42L-5,32L-5,8L-46,18L-46,12L-5,-8L-5,-32C-5,-40 -3.5,-47 0,-50Z" transform="translate(330,114.0) rotate(180) scale(1.05)"/><rect class="mu-tail" x="328" y="161" width="4" height="6" style="--w:#1f5fbf"/><line class="mu-leadin" x1="570" y1="800.0" x2="570" y2="946.0"/><rect class="mu-build" x="551.0" y="554.0" width="38" height="248.0"/><g style="--w:#0f7f7a"><circle class="mu-tip" cx="570" cy="800.0" r="24"/><text class="mu-signletter" x="570" y="800.0">B</text></g><path class="mu-parked" d="M0,-50C3.5,-47 5,-40 5,-32L5,-8L46,12L46,18L5,8L5,32L17,42L17,47L3,44L0,50L-3,44L-17,47L-17,42L-5,32L-5,8L-46,18L-46,12L-5,-8L-5,-32C-5,-40 -3.5,-47 0,-50Z" transform="translate(570,886.0) rotate(0) scale(1.05)"/><rect class="mu-tail" x="568" y="833" width="4" height="6" style="--w:#0f7f7a"/><line class="mu-leadin" x1="810" y1="200.0" x2="810" y2="54.0"/><rect class="mu-build" x="791.0" y="198.0" width="38" height="248.0"/><g style="--w:#b35f12"><circle class="mu-tip" cx="810" cy="200.0" r="24"/><text class="mu-signletter" x="810" y="200.0">C</text></g><path class="mu-parked" d="M0,-50C3.5,-47 5,-40 5,-32L5,-8L46,12L46,18L5,8L5,32L17,42L17,47L3,44L0,50L-3,44L-17,47L-17,42L-5,32L-5,8L-46,18L-46,12L-5,-8L-5,-32C-5,-40 -3.5,-47 0,-50Z" transform="translate(810,114.0) rotate(180) scale(1.05)"/><rect class="mu-tail" x="808" y="161" width="4" height="6" style="--w:#b35f12"/><line class="mu-leadin" x1="1050" y1="708.0" x2="1050" y2="854.0"/><rect class="mu-build" x="1031.0" y="554.0" width="38" height="156.0"/><g style="--w:#c0283a"><circle class="mu-tip" cx="1050" cy="708.0" r="24"/><text class="mu-signletter" x="1050" y="708.0">D</text></g><path class="mu-parked" d="M0,-50C3.5,-47 5,-40 5,-32L5,-8L46,12L46,18L5,8L5,32L17,42L17,47L3,44L0,50L-3,44L-17,47L-17,42L-5,32L-5,8L-46,18L-46,12L-5,-8L-5,-32C-5,-40 -3.5,-47 0,-50Z" transform="translate(1050,794.0) rotate(0) scale(1.05)"/><rect class="mu-tail" x="1048" y="741" width="4" height="6" style="--w:#c0283a"/><rect class="mu-build mu-terminal" x="90" y="444.0" width="1160" height="112" rx="24"/><rect class="mu-glass" x="104" y="454.0" width="1132" height="6" rx="3"/><rect class="mu-glass" x="104" y="540.0" width="1132" height="6" rx="3"/><path class="mu-arrow" d="M54,530 h26 m-9,-8 l9,8 l-9,8"/><path class="mu-bridge" d="M1250,470 H1370 V334.0 H1411"/><g transform="translate(1420,460) scale(1.05)"><path class="mu-concorde" d="M0,-180C4,-170 7,-150 8,-120L9,-40C30,10 70,70 98,128L98,140L9,142L9,165L4,180L-4,180L-9,165L-9,142L-98,140L-98,128C-70,70 -30,10 -9,-40L-8,-120C-7,-150 -4,-170 0,-180Z"/><line class="mu-fin" x1="0" y1="118" x2="0" y2="176"/><circle class="mu-window" cx="-5" cy="-150" r="1.6"/><circle class="mu-window" cx="5" cy="-150" r="1.6"/><circle class="mu-window" cx="-5" cy="-138" r="1.6"/><circle class="mu-window" cx="5" cy="-138" r="1.6"/><circle class="mu-window" cx="-5" cy="-126" r="1.6"/><circle class="mu-window" cx="5" cy="-126" r="1.6"/><circle class="mu-window" cx="-5" cy="-114" r="1.6"/><circle class="mu-window" cx="5" cy="-114" r="1.6"/><circle class="mu-window" cx="-5" cy="-102" r="1.6"/><circle class="mu-window" cx="5" cy="-102" r="1.6"/><circle class="mu-window" cx="-5" cy="-90" r="1.6"/><circle class="mu-window" cx="5" cy="-90" r="1.6"/><circle class="mu-window" cx="-5" cy="-78" r="1.6"/><circle class="mu-window" cx="5" cy="-78" r="1.6"/><circle class="mu-window" cx="-5" cy="-66" r="1.6"/><circle class="mu-window" cx="5" cy="-66" r="1.6"/><circle class="mu-window" cx="-5" cy="-54" r="1.6"/><circle class="mu-window" cx="5" cy="-54" r="1.6"/><circle class="mu-window" cx="-5" cy="-42" r="1.6"/><circle class="mu-window" cx="5" cy="-42" r="1.6"/><circle class="mu-window" cx="-5" cy="-30" r="1.6"/><circle class="mu-window" cx="5" cy="-30" r="1.6"/><circle class="mu-window" cx="-5" cy="-18" r="1.6"/><circle class="mu-window" cx="5" cy="-18" r="1.6"/><circle class="mu-window" cx="-5" cy="-6" r="1.6"/><circle class="mu-window" cx="5" cy="-6" r="1.6"/><circle class="mu-window" cx="-5" cy="6" r="1.6"/><circle class="mu-window" cx="5" cy="6" r="1.6"/><circle class="mu-window" cx="-5" cy="18" r="1.6"/><circle class="mu-window" cx="5" cy="18" r="1.6"/><circle class="mu-window" cx="-5" cy="30" r="1.6"/><circle class="mu-window" cx="5" cy="30" r="1.6"/></g><g class="mu-room" data-slug="carte-reseau" style="--w:#1f5fbf"><rect class="mu-roombox" x="123.0" y="330" width="190" height="80" rx="8"/><circle class="mu-badge" cx="218.0" cy="370" r="27"/><text class="mu-c mu-cbig" x="218.0" y="370">A1</text><g class="mu-seen"><circle cx="301" cy="342" r="9"/><path d="M297,342 l3,3 l5,-6"/></g></g><g class="mu-room" data-slug="monde-retrecit" style="--w:#1f5fbf"><rect class="mu-roombox" x="347.0" y="330" width="190" height="80" rx="8"/><circle class="mu-badge" cx="442.0" cy="370" r="27"/><text class="mu-c mu-cbig" x="442.0" y="370">A2</text><g class="mu-seen"><circle cx="525" cy="342" r="9"/><path d="M521,342 l3,3 l5,-6"/></g></g><g class="mu-room" data-slug="villes-renommees" style="--w:#1f5fbf"><rect class="mu-roombox" x="123.0" y="238" width="190" height="80" rx="8"/><circle class="mu-badge" cx="218.0" cy="278" r="27"/><text class="mu-c mu-cbig" x="218.0" y="278">A3</text><g class="mu-seen"><circle cx="301" cy="250" r="9"/><path d="M297,250 l3,3 l5,-6"/></g></g><g class="mu-room" data-slug="prix-billets" style="--w:#1f5fbf"><rect class="mu-roombox" x="347.0" y="238" width="190" height="80" rx="8"/><circle class="mu-badge" cx="442.0" cy="278" r="27"/><text class="mu-c mu-cbig" x="442.0" y="278">A4</text><g class="mu-seen"><circle cx="525" cy="250" r="9"/><path d="M521,250 l3,3 l5,-6"/></g></g><g class="mu-room" data-slug="frise-avions" style="--w:#0f7f7a"><rect class="mu-roombox" x="363.0" y="590" width="190" height="80" rx="8"/><circle class="mu-badge" cx="458.0" cy="630" r="27"/><text class="mu-c mu-cbig" x="458.0" y="630">B1</text><g class="mu-seen"><circle cx="541" cy="602" r="9"/><path d="M537,602 l3,3 l5,-6"/></g></g><g class="mu-room" data-slug="vie-avion" style="--w:#0f7f7a"><rect class="mu-roombox" x="587.0" y="590" width="190" height="80" rx="8"/><circle class="mu-badge" cx="682.0" cy="630" r="27"/><text class="mu-c mu-cbig" x="682.0" y="630">B2</text><g class="mu-seen"><circle cx="765" cy="602" r="9"/><path d="M761,602 l3,3 l5,-6"/></g></g><g class="mu-room" data-slug="chiffres" style="--w:#0f7f7a"><rect class="mu-roombox" x="363.0" y="682" width="190" height="80" rx="8"/><circle class="mu-badge" cx="458.0" cy="722" r="27"/><text class="mu-c mu-cbig" x="458.0" y="722">B3</text><g class="mu-seen"><circle cx="541" cy="694" r="9"/><path d="M537,694 l3,3 l5,-6"/></g></g><g class="mu-room" data-slug="ce-jour-la" style="--w:#b35f12"><rect class="mu-roombox" x="603.0" y="330" width="190" height="80" rx="8"/><circle class="mu-badge" cx="698.0" cy="370" r="27"/><text class="mu-c mu-cbig" x="698.0" y="370">C1</text><g class="mu-seen"><circle cx="781" cy="342" r="9"/><path d="M777,342 l3,3 l5,-6"/></g></g><g class="mu-room" data-slug="personnages-lieux" style="--w:#b35f12"><rect class="mu-roombox" x="827.0" y="330" width="190" height="80" rx="8"/><circle class="mu-badge" cx="922.0" cy="370" r="27"/><text class="mu-c mu-cbig" x="922.0" y="370">C2</text><g class="mu-seen"><circle cx="1005" cy="342" r="9"/><path d="M1001,342 l3,3 l5,-6"/></g></g><g class="mu-room" data-slug="graphe-personnes" style="--w:#b35f12"><rect class="mu-roombox" x="603.0" y="238" width="190" height="80" rx="8"/><circle class="mu-badge" cx="698.0" cy="278" r="27"/><text class="mu-c mu-cbig" x="698.0" y="278">C3</text><g class="mu-seen"><circle cx="781" cy="250" r="9"/><path d="M777,250 l3,3 l5,-6"/></g></g><g class="mu-room" data-slug="genealogie" style="--w:#b35f12"><rect class="mu-roombox" x="827.0" y="238" width="190" height="80" rx="8"/><circle class="mu-badge" cx="922.0" cy="278" r="27"/><text class="mu-c mu-cbig" x="922.0" y="278">C4</text><g class="mu-seen"><circle cx="1005" cy="250" r="9"/><path d="M1001,250 l3,3 l5,-6"/></g></g><g class="mu-room" data-slug="greves-records" style="--w:#c0283a"><rect class="mu-roombox" x="843.0" y="590" width="190" height="80" rx="8"/><circle class="mu-badge" cx="938.0" cy="630" r="27"/><text class="mu-c mu-cbig" x="938.0" y="630">D1</text><g class="mu-seen"><circle cx="1021" cy="602" r="9"/><path d="M1017,602 l3,3 l5,-6"/></g></g><g class="mu-room" data-slug="barometre-crises" style="--w:#c0283a"><rect class="mu-roombox" x="1067.0" y="590" width="190" height="80" rx="8"/><circle class="mu-badge" cx="1162.0" cy="630" r="27"/><text class="mu-c mu-cbig" x="1162.0" y="630">D2</text><g class="mu-seen"><circle cx="1245" cy="602" r="9"/><path d="M1241,602 l3,3 l5,-6"/></g></g><g class="mu-room mu-here" data-slug="quiz" style="--w:#6a4cb5"><rect class="mu-cabin" x="1412" y="282" width="16" height="158" rx="6"/><line class="mu-leader" x1="1432" y1="360" x2="1540.0" y2="360"/><rect class="mu-roombox" x="1540.0" y="320" width="190" height="80" rx="8"/><circle class="mu-badge" cx="1635.0" cy="360" r="27"/><text class="mu-c mu-cbig" x="1635.0" y="360">K1</text><g class="mu-seen"><circle cx="1718" cy="332" r="9"/><path d="M1714,332 l3,3 l5,-6"/></g></g><g class="mu-room" data-slug="devine-annee" style="--w:#6a4cb5"><rect class="mu-cabin" x="1412" y="439" width="16" height="158" rx="6"/><line class="mu-leader" x1="1432" y1="518" x2="1540.0" y2="518"/><rect class="mu-roombox" x="1540.0" y="478" width="190" height="80" rx="8"/><circle class="mu-badge" cx="1635.0" cy="518" r="27"/><text class="mu-c mu-cbig" x="1635.0" y="518">K2</text><g class="mu-seen"><circle cx="1718" cy="490" r="9"/><path d="M1714,490 l3,3 l5,-6"/></g></g><g class="mu-room" data-slug="demande-musee" style="--w:#b0307a"><circle class="mu-roombox" cx="670.0" cy="486" r="30"/><text class="mu-info-i" x="670.0" y="486">i</text><g class="mu-seen"><circle cx="694" cy="462" r="9"/><path d="M690,462 l3,3 l5,-6"/></g></g><g class="mu-me" transform="translate(1635,316)"><circle class="mu-halo" r="18"/><circle class="mu-dot" r="8"/></g></svg><span>Vous êtes ici · K1 · voir le plan</span></button></section><main class="mu-vitrine">
+
+<div class="card" id="start">
+  <p class="ask" style="margin-top:0">Choisis ton niveau, puis réponds à <b>5 questions</b> tirées des éphémérides d'Air France.</p>
+  <div class="levels" id="levels"></div>
+  <div class="who"><label for="pseudo">Ton pseudo</label><input type="text" id="pseudo" maxlength="20" placeholder="Anonyme" autocomplete="nickname">
+    <button class="go" id="play">Jouer</button></div>
+  <ul class="rules">
+    <li><b>5 000 points maximum par question</b> : points = précision × rapidité. Répondre tout de suite garde 100 % des points, attendre le temps imparti n'en garde que la moitié.</li>
+    <li>Les 5 questions utilisent <b>5 modes de réponse différents</b> : clic sur la carte, curseur sur une frise, estimation d'un chiffre, remise en ordre chronologique, mot à deviner.</li>
+    <li>Toutes les réponses viennent des textes des éphémérides, cités après chaque question.</li>
+  </ul>
+</div>
+
+<div class="card hidden" id="game">
+  <div class="bar"><span>Question <b id="qn">1</b> / 5 · <span class="chip" id="qmode"></span> · <span id="qlevel"></span></span><span>Score : <b id="score">0</b></span></div>
+  <div class="timer"><i id="tbar"></i></div>
+  <div class="pot" id="pot"></div>
+
+  <div id="p-carte" class="panel hidden">
+    <p class="ask">Où se trouve <b id="c-name"></b> <span class="muted" id="c-country"></span> ?</p>
+    <div class="mapwrap"><svg id="map"></svg>
+      <div class="mapbtns"><button id="zin" title="Zoom +">+</button><button id="zout" title="Zoom −">−</button><button id="zreset" title="Vue d'ensemble">⌂</button></div></div>
+    <div class="row" style="margin-top:10px"><button class="go" id="c-ok" disabled>Valider</button>
+      <span class="muted" id="c-help">Clique sur la carte (molette ou boutons pour zoomer, glisser pour déplacer). Plus tu es proche, plus tu gagnes de points.</span></div>
+  </div>
+
+  <div id="p-annee" class="panel hidden">
+    <p class="ask">En quelle année cela s'est-il passé ?</p>
+    <p class="txt" id="y-text"></p>
+    <div class="row"><span class="yearbig" id="y-val"></span><input type="range" id="y-sl" aria-label="Année proposée" min="1905" max="2022" step="1"><button class="go" id="y-ok">Valider</button></div>
+  </div>
+
+  <div id="p-nombre" class="panel hidden">
+    <p class="ask" id="n-prompt"></p>
+    <div class="row"><input type="text" inputmode="decimal" id="n-in" placeholder="Ta valeur" autocomplete="off" style="width:180px"><b id="n-unit"></b><button class="go" id="n-ok">Valider</button></div>
+    <p class="muted" id="n-msg" style="min-height:1.4em;margin:8px 0 0"></p>
+  </div>
+
+  <div id="p-ordre" class="panel hidden">
+    <p class="ask">Remets ces événements dans l'ordre chronologique : clique du <b>plus ancien</b> au <b>plus récent</b>.</p>
+    <div class="cards" id="o-cards"></div>
+    <div class="row"><button class="go" id="o-ok" disabled>Valider</button><button class="alt" id="o-reset">Recommencer</button></div>
+  </div>
+
+  <div id="p-texte" class="panel hidden">
+    <p class="ask" id="t-prompt"></p>
+    <p class="txt" id="t-text"></p>
+    <div class="row"><input type="text" id="t-in" placeholder="Ta réponse" autocomplete="off" style="width:240px"><button class="go" id="t-ok">Valider</button>
+      <button class="alt" id="t-hint">Indice (−25 %)</button><button class="alt" id="t-skip">Je passe</button></div>
+    <p class="muted" id="t-msg" style="min-height:1.4em;margin:8px 0 0"></p>
+  </div>
+
+  <div class="reveal hidden" id="reveal">
+    <div class="pts" id="r-pts"></div><div class="det" id="r-det"></div>
+    <div id="r-ans"></div><div class="src" id="r-src"></div>
+    <button class="go" id="next">Question suivante</button>
+  </div>
+</div>
+
+<div class="card hidden" id="end">
+  <p class="muted" style="margin:0">Partie terminée · niveau <b id="e-level"></b></p>
+  <div class="final"><span id="e-score"></span> <span style="font-size:20px;font-weight:600">/ 25 000</span></div>
+  <p id="e-rank" class="ask"></p>
+  <table class="t" id="e-table"></table>
+  <div class="row" style="margin-top:14px"><button class="go" id="again">Rejouer</button><button class="alt" id="menu">Changer de niveau</button></div>
+</div>
+
+<div class="card board" id="boardcard">
+  <h2 style="margin:0 0 10px;font-size:20px">Classement</h2>
+  <div class="tabs" id="tabs"></div>
+  <table class="t" id="board"></table>
+  <div class="row" style="margin-top:12px"><button class="alt" id="export">Exporter</button><button class="alt" id="import">Importer</button>
+    <button class="alt" id="clear">Effacer</button><input type="file" id="file" accept="application/json" class="hidden"></div>
+  <p class="note">Le classement est enregistré dans ce navigateur (le site est statique, sans serveur) : pour comparer vos scores, exportez-le et importez celui des autres, les parties sont fusionnées.</p>
+</div>
+
+</main></div><nav class="mu-doors" aria-label="Salles voisines"><a class="mu-door prev" href="barometre-crises.html" style="--w:#c0283a"><small>← Salle précédente · D2</small><b>Baromètre des crises</b></a><a class="mu-hallbtn" href="index.html"><span>⌂</span>Retour au hall</a><a class="mu-door next" href="devine-annee.html" style="--w:#6a4cb5"><small>Salle suivante → · K2</small><b>Devine l&#x27;année</b></a></nav><footer class="mu-foot">Musée Air France · les éphémérides en données · ← → pour changer de salle, P pour le plan</footer><div class="mu-drawer" id="mu-drawer" hidden><div class="mu-drawer-box" role="dialog" aria-label="Plan du musée"><div class="mu-drawer-head"><span>Plan du musée · vous êtes en K1</span><button class="mu-close">Fermer ✕</button></div><svg class="mu-plan mu-mini" viewBox="0 0 1760 1000" role="img" aria-label="Plan du musée"><rect class="mu-grass" width="1760" height="1000"/><rect class="mu-apron" x="20" y="64" width="1720" height="872" rx="34"/><rect class="mu-runway" x="40" y="14" width="1680" height="40" rx="4"/><line class="mu-rwline" x1="90" y1="34" x2="1670" y2="34"/><rect class="mu-runway" x="40" y="946" width="1680" height="40" rx="4"/><line class="mu-rwline" x1="90" y1="966" x2="1670" y2="966"/><line class="mu-leadin" x1="330" y1="200.0" x2="330" y2="54.0"/><rect class="mu-build" x="311.0" y="198.0" width="38" height="248.0"/><g style="--w:#1f5fbf"><circle class="mu-tip" cx="330" cy="200.0" r="24"/><text class="mu-signletter" x="330" y="200.0">A</text></g><path class="mu-parked" d="M0,-50C3.5,-47 5,-40 5,-32L5,-8L46,12L46,18L5,8L5,32L17,42L17,47L3,44L0,50L-3,44L-17,47L-17,42L-5,32L-5,8L-46,18L-46,12L-5,-8L-5,-32C-5,-40 -3.5,-47 0,-50Z" transform="translate(330,114.0) rotate(180) scale(1.05)"/><rect class="mu-tail" x="328" y="161" width="4" height="6" style="--w:#1f5fbf"/><line class="mu-leadin" x1="570" y1="800.0" x2="570" y2="946.0"/><rect class="mu-build" x="551.0" y="554.0" width="38" height="248.0"/><g style="--w:#0f7f7a"><circle class="mu-tip" cx="570" cy="800.0" r="24"/><text class="mu-signletter" x="570" y="800.0">B</text></g><path class="mu-parked" d="M0,-50C3.5,-47 5,-40 5,-32L5,-8L46,12L46,18L5,8L5,32L17,42L17,47L3,44L0,50L-3,44L-17,47L-17,42L-5,32L-5,8L-46,18L-46,12L-5,-8L-5,-32C-5,-40 -3.5,-47 0,-50Z" transform="translate(570,886.0) rotate(0) scale(1.05)"/><rect class="mu-tail" x="568" y="833" width="4" height="6" style="--w:#0f7f7a"/><line class="mu-leadin" x1="810" y1="200.0" x2="810" y2="54.0"/><rect class="mu-build" x="791.0" y="198.0" width="38" height="248.0"/><g style="--w:#b35f12"><circle class="mu-tip" cx="810" cy="200.0" r="24"/><text class="mu-signletter" x="810" y="200.0">C</text></g><path class="mu-parked" d="M0,-50C3.5,-47 5,-40 5,-32L5,-8L46,12L46,18L5,8L5,32L17,42L17,47L3,44L0,50L-3,44L-17,47L-17,42L-5,32L-5,8L-46,18L-46,12L-5,-8L-5,-32C-5,-40 -3.5,-47 0,-50Z" transform="translate(810,114.0) rotate(180) scale(1.05)"/><rect class="mu-tail" x="808" y="161" width="4" height="6" style="--w:#b35f12"/><line class="mu-leadin" x1="1050" y1="708.0" x2="1050" y2="854.0"/><rect class="mu-build" x="1031.0" y="554.0" width="38" height="156.0"/><g style="--w:#c0283a"><circle class="mu-tip" cx="1050" cy="708.0" r="24"/><text class="mu-signletter" x="1050" y="708.0">D</text></g><path class="mu-parked" d="M0,-50C3.5,-47 5,-40 5,-32L5,-8L46,12L46,18L5,8L5,32L17,42L17,47L3,44L0,50L-3,44L-17,47L-17,42L-5,32L-5,8L-46,18L-46,12L-5,-8L-5,-32C-5,-40 -3.5,-47 0,-50Z" transform="translate(1050,794.0) rotate(0) scale(1.05)"/><rect class="mu-tail" x="1048" y="741" width="4" height="6" style="--w:#c0283a"/><rect class="mu-build mu-terminal" x="90" y="444.0" width="1160" height="112" rx="24"/><rect class="mu-glass" x="104" y="454.0" width="1132" height="6" rx="3"/><rect class="mu-glass" x="104" y="540.0" width="1132" height="6" rx="3"/><path class="mu-arrow" d="M54,530 h26 m-9,-8 l9,8 l-9,8"/><path class="mu-bridge" d="M1250,470 H1370 V334.0 H1411"/><g transform="translate(1420,460) scale(1.05)"><path class="mu-concorde" d="M0,-180C4,-170 7,-150 8,-120L9,-40C30,10 70,70 98,128L98,140L9,142L9,165L4,180L-4,180L-9,165L-9,142L-98,140L-98,128C-70,70 -30,10 -9,-40L-8,-120C-7,-150 -4,-170 0,-180Z"/><line class="mu-fin" x1="0" y1="118" x2="0" y2="176"/><circle class="mu-window" cx="-5" cy="-150" r="1.6"/><circle class="mu-window" cx="5" cy="-150" r="1.6"/><circle class="mu-window" cx="-5" cy="-138" r="1.6"/><circle class="mu-window" cx="5" cy="-138" r="1.6"/><circle class="mu-window" cx="-5" cy="-126" r="1.6"/><circle class="mu-window" cx="5" cy="-126" r="1.6"/><circle class="mu-window" cx="-5" cy="-114" r="1.6"/><circle class="mu-window" cx="5" cy="-114" r="1.6"/><circle class="mu-window" cx="-5" cy="-102" r="1.6"/><circle class="mu-window" cx="5" cy="-102" r="1.6"/><circle class="mu-window" cx="-5" cy="-90" r="1.6"/><circle class="mu-window" cx="5" cy="-90" r="1.6"/><circle class="mu-window" cx="-5" cy="-78" r="1.6"/><circle class="mu-window" cx="5" cy="-78" r="1.6"/><circle class="mu-window" cx="-5" cy="-66" r="1.6"/><circle class="mu-window" cx="5" cy="-66" r="1.6"/><circle class="mu-window" cx="-5" cy="-54" r="1.6"/><circle class="mu-window" cx="5" cy="-54" r="1.6"/><circle class="mu-window" cx="-5" cy="-42" r="1.6"/><circle class="mu-window" cx="5" cy="-42" r="1.6"/><circle class="mu-window" cx="-5" cy="-30" r="1.6"/><circle class="mu-window" cx="5" cy="-30" r="1.6"/><circle class="mu-window" cx="-5" cy="-18" r="1.6"/><circle class="mu-window" cx="5" cy="-18" r="1.6"/><circle class="mu-window" cx="-5" cy="-6" r="1.6"/><circle class="mu-window" cx="5" cy="-6" r="1.6"/><circle class="mu-window" cx="-5" cy="6" r="1.6"/><circle class="mu-window" cx="5" cy="6" r="1.6"/><circle class="mu-window" cx="-5" cy="18" r="1.6"/><circle class="mu-window" cx="5" cy="18" r="1.6"/><circle class="mu-window" cx="-5" cy="30" r="1.6"/><circle class="mu-window" cx="5" cy="30" r="1.6"/></g><a class="mu-room" data-slug="carte-reseau" style="--w:#1f5fbf" href="carte-reseau.html" aria-label="A1 · Carte animée du réseau"><title>A1 · Carte animée du réseau</title><rect class="mu-roombox" x="123.0" y="330" width="190" height="80" rx="8"/><circle class="mu-badge" cx="218.0" cy="370" r="27"/><text class="mu-c mu-cbig" x="218.0" y="370">A1</text><g class="mu-seen"><circle cx="301" cy="342" r="9"/><path d="M297,342 l3,3 l5,-6"/></g></a><a class="mu-room" data-slug="monde-retrecit" style="--w:#1f5fbf" href="monde-retrecit.html" aria-label="A2 · Le monde rétrécit"><title>A2 · Le monde rétrécit</title><rect class="mu-roombox" x="347.0" y="330" width="190" height="80" rx="8"/><circle class="mu-badge" cx="442.0" cy="370" r="27"/><text class="mu-c mu-cbig" x="442.0" y="370">A2</text><g class="mu-seen"><circle cx="525" cy="342" r="9"/><path d="M521,342 l3,3 l5,-6"/></g></a><a class="mu-room" data-slug="villes-renommees" style="--w:#1f5fbf" href="villes-renommees.html" aria-label="A3 · Villes renommées"><title>A3 · Villes renommées</title><rect class="mu-roombox" x="123.0" y="238" width="190" height="80" rx="8"/><circle class="mu-badge" cx="218.0" cy="278" r="27"/><text class="mu-c mu-cbig" x="218.0" y="278">A3</text><g class="mu-seen"><circle cx="301" cy="250" r="9"/><path d="M297,250 l3,3 l5,-6"/></g></a><a class="mu-room" data-slug="prix-billets" style="--w:#1f5fbf" href="prix-billets.html" aria-label="A4 · Prix des billets"><title>A4 · Prix des billets</title><rect class="mu-roombox" x="347.0" y="238" width="190" height="80" rx="8"/><circle class="mu-badge" cx="442.0" cy="278" r="27"/><text class="mu-c mu-cbig" x="442.0" y="278">A4</text><g class="mu-seen"><circle cx="525" cy="250" r="9"/><path d="M521,250 l3,3 l5,-6"/></g></a><a class="mu-room" data-slug="frise-avions" style="--w:#0f7f7a" href="frise-avions.html" aria-label="B1 · Frise des avions"><title>B1 · Frise des avions</title><rect class="mu-roombox" x="363.0" y="590" width="190" height="80" rx="8"/><circle class="mu-badge" cx="458.0" cy="630" r="27"/><text class="mu-c mu-cbig" x="458.0" y="630">B1</text><g class="mu-seen"><circle cx="541" cy="602" r="9"/><path d="M537,602 l3,3 l5,-6"/></g></a><a class="mu-room" data-slug="vie-avion" style="--w:#0f7f7a" href="vie-avion.html" aria-label="B2 · La vie d&#x27;un avion"><title>B2 · La vie d&#x27;un avion</title><rect class="mu-roombox" x="587.0" y="590" width="190" height="80" rx="8"/><circle class="mu-badge" cx="682.0" cy="630" r="27"/><text class="mu-c mu-cbig" x="682.0" y="630">B2</text><g class="mu-seen"><circle cx="765" cy="602" r="9"/><path d="M761,602 l3,3 l5,-6"/></g></a><a class="mu-room" data-slug="chiffres" style="--w:#0f7f7a" href="chiffres.html" aria-label="B3 · Air France en chiffres"><title>B3 · Air France en chiffres</title><rect class="mu-roombox" x="363.0" y="682" width="190" height="80" rx="8"/><circle class="mu-badge" cx="458.0" cy="722" r="27"/><text class="mu-c mu-cbig" x="458.0" y="722">B3</text><g class="mu-seen"><circle cx="541" cy="694" r="9"/><path d="M537,694 l3,3 l5,-6"/></g></a><a class="mu-room" data-slug="ce-jour-la" style="--w:#b35f12" href="ce-jour-la.html" aria-label="C1 · Ce jour-là chez Air France"><title>C1 · Ce jour-là chez Air France</title><rect class="mu-roombox" x="603.0" y="330" width="190" height="80" rx="8"/><circle class="mu-badge" cx="698.0" cy="370" r="27"/><text class="mu-c mu-cbig" x="698.0" y="370">C1</text><g class="mu-seen"><circle cx="781" cy="342" r="9"/><path d="M777,342 l3,3 l5,-6"/></g></a><a class="mu-room" data-slug="personnages-lieux" style="--w:#b35f12" href="personnages-lieux.html" aria-label="C2 · Personnages et lieux"><title>C2 · Personnages et lieux</title><rect class="mu-roombox" x="827.0" y="330" width="190" height="80" rx="8"/><circle class="mu-badge" cx="922.0" cy="370" r="27"/><text class="mu-c mu-cbig" x="922.0" y="370">C2</text><g class="mu-seen"><circle cx="1005" cy="342" r="9"/><path d="M1001,342 l3,3 l5,-6"/></g></a><a class="mu-room" data-slug="graphe-personnes" style="--w:#b35f12" href="graphe-personnes.html" aria-label="C3 · Le graphe des personnes"><title>C3 · Le graphe des personnes</title><rect class="mu-roombox" x="603.0" y="238" width="190" height="80" rx="8"/><circle class="mu-badge" cx="698.0" cy="278" r="27"/><text class="mu-c mu-cbig" x="698.0" y="278">C3</text><g class="mu-seen"><circle cx="781" cy="250" r="9"/><path d="M777,250 l3,3 l5,-6"/></g></a><a class="mu-room" data-slug="genealogie" style="--w:#b35f12" href="genealogie.html" aria-label="C4 · Généalogie des compagnies"><title>C4 · Généalogie des compagnies</title><rect class="mu-roombox" x="827.0" y="238" width="190" height="80" rx="8"/><circle class="mu-badge" cx="922.0" cy="278" r="27"/><text class="mu-c mu-cbig" x="922.0" y="278">C4</text><g class="mu-seen"><circle cx="1005" cy="250" r="9"/><path d="M1001,250 l3,3 l5,-6"/></g></a><a class="mu-room" data-slug="greves-records" style="--w:#c0283a" href="greves-records.html" aria-label="D1 · Grèves et accidents face aux records"><title>D1 · Grèves et accidents face aux records</title><rect class="mu-roombox" x="843.0" y="590" width="190" height="80" rx="8"/><circle class="mu-badge" cx="938.0" cy="630" r="27"/><text class="mu-c mu-cbig" x="938.0" y="630">D1</text><g class="mu-seen"><circle cx="1021" cy="602" r="9"/><path d="M1017,602 l3,3 l5,-6"/></g></a><a class="mu-room" data-slug="barometre-crises" style="--w:#c0283a" href="barometre-crises.html" aria-label="D2 · Baromètre des crises"><title>D2 · Baromètre des crises</title><rect class="mu-roombox" x="1067.0" y="590" width="190" height="80" rx="8"/><circle class="mu-badge" cx="1162.0" cy="630" r="27"/><text class="mu-c mu-cbig" x="1162.0" y="630">D2</text><g class="mu-seen"><circle cx="1245" cy="602" r="9"/><path d="M1241,602 l3,3 l5,-6"/></g></a><a class="mu-room mu-here" data-slug="quiz" style="--w:#6a4cb5" href="quiz.html" aria-label="K1 · Le Grand Quiz"><title>K1 · Le Grand Quiz</title><rect class="mu-cabin" x="1412" y="282" width="16" height="158" rx="6"/><line class="mu-leader" x1="1432" y1="360" x2="1540.0" y2="360"/><rect class="mu-roombox" x="1540.0" y="320" width="190" height="80" rx="8"/><circle class="mu-badge" cx="1635.0" cy="360" r="27"/><text class="mu-c mu-cbig" x="1635.0" y="360">K1</text><g class="mu-seen"><circle cx="1718" cy="332" r="9"/><path d="M1714,332 l3,3 l5,-6"/></g></a><a class="mu-room" data-slug="devine-annee" style="--w:#6a4cb5" href="devine-annee.html" aria-label="K2 · Devine l&#x27;année"><title>K2 · Devine l&#x27;année</title><rect class="mu-cabin" x="1412" y="439" width="16" height="158" rx="6"/><line class="mu-leader" x1="1432" y1="518" x2="1540.0" y2="518"/><rect class="mu-roombox" x="1540.0" y="478" width="190" height="80" rx="8"/><circle class="mu-badge" cx="1635.0" cy="518" r="27"/><text class="mu-c mu-cbig" x="1635.0" y="518">K2</text><g class="mu-seen"><circle cx="1718" cy="490" r="9"/><path d="M1714,490 l3,3 l5,-6"/></g></a><a class="mu-room" data-slug="demande-musee" style="--w:#b0307a" href="demande-musee.html" aria-label="H1 · Demande au musée"><title>H1 · Demande au musée</title><circle class="mu-roombox" cx="670.0" cy="486" r="30"/><text class="mu-info-i" x="670.0" y="486">i</text><g class="mu-seen"><circle cx="694" cy="462" r="9"/><path d="M690,462 l3,3 l5,-6"/></g></a><g class="mu-me" transform="translate(1635,316)"><circle class="mu-halo" r="18"/><circle class="mu-dot" r="8"/></g></svg><div class="mu-legend"><a href="carte-reseau.html" data-slug="carte-reseau"><span class="mu-gate" style="--w:#1f5fbf">A1</span><b>Carte animée du réseau</b></a><a href="monde-retrecit.html" data-slug="monde-retrecit"><span class="mu-gate" style="--w:#1f5fbf">A2</span><b>Le monde rétrécit</b></a><a href="villes-renommees.html" data-slug="villes-renommees"><span class="mu-gate" style="--w:#1f5fbf">A3</span><b>Villes renommées</b></a><a href="prix-billets.html" data-slug="prix-billets"><span class="mu-gate" style="--w:#1f5fbf">A4</span><b>Prix des billets</b></a><a href="frise-avions.html" data-slug="frise-avions"><span class="mu-gate" style="--w:#0f7f7a">B1</span><b>Frise des avions</b></a><a href="vie-avion.html" data-slug="vie-avion"><span class="mu-gate" style="--w:#0f7f7a">B2</span><b>La vie d&#x27;un avion</b></a><a href="chiffres.html" data-slug="chiffres"><span class="mu-gate" style="--w:#0f7f7a">B3</span><b>Air France en chiffres</b></a><a href="ce-jour-la.html" data-slug="ce-jour-la"><span class="mu-gate" style="--w:#b35f12">C1</span><b>Ce jour-là chez Air France</b></a><a href="personnages-lieux.html" data-slug="personnages-lieux"><span class="mu-gate" style="--w:#b35f12">C2</span><b>Personnages et lieux</b></a><a href="graphe-personnes.html" data-slug="graphe-personnes"><span class="mu-gate" style="--w:#b35f12">C3</span><b>Le graphe des personnes</b></a><a href="genealogie.html" data-slug="genealogie"><span class="mu-gate" style="--w:#b35f12">C4</span><b>Généalogie des compagnies</b></a><a href="greves-records.html" data-slug="greves-records"><span class="mu-gate" style="--w:#c0283a">D1</span><b>Grèves et accidents face aux records</b></a><a href="barometre-crises.html" data-slug="barometre-crises"><span class="mu-gate" style="--w:#c0283a">D2</span><b>Baromètre des crises</b></a><a href="quiz.html" data-slug="quiz" class="mu-cur"><span class="mu-gate" style="--w:#6a4cb5">K1</span><b>Le Grand Quiz</b></a><a href="devine-annee.html" data-slug="devine-annee"><span class="mu-gate" style="--w:#6a4cb5">K2</span><b>Devine l&#x27;année</b></a><a href="demande-musee.html" data-slug="demande-musee"><span class="mu-gate" style="--w:#b0307a">H1</span><b>Demande au musée</b></a></div></div></div><script>
+const Q = [{"mode":"carte","level":"facile","label":"New York","country":"États-Unis","lat":40.713,"lon":-74.006,"fact":["1946-06-24","Inauguration de la ligne Paris-New York"],"id":"carte-facile-1"},{"mode":"carte","level":"facile","label":"Tokyo","country":"Japon","lat":35.676,"lon":139.65,"fact":["1952-11-24","Inauguration de la ligne Paris-Tokyo d'Air France"],"id":"carte-facile-2"},{"mode":"carte","level":"facile","label":"Rio de Janeiro","country":"Brésil","lat":-22.907,"lon":-43.173,"fact":null,"id":"carte-facile-3"},{"mode":"carte","level":"facile","label":"Le Caire","country":"Égypte","lat":30.044,"lon":31.236,"fact":["1913-11-10","Vol Paris-Le Caire de Marc Bonnier"],"id":"carte-facile-4"},{"mode":"carte","level":"facile","label":"Moscou","country":"Russie","lat":55.756,"lon":37.617,"fact":["1954-06-13","Accords pour la ligne aérienne Paris-Moscou"],"id":"carte-facile-5"},{"mode":"carte","level":"facile","label":"Sydney","country":"Australie","lat":-33.869,"lon":151.209,"fact":["1965-04-13","Nouvelle desserte de Sydney par UTA"],"id":"carte-facile-6"},{"mode":"carte","level":"facile","label":"Los Angeles","country":"États-Unis","lat":34.052,"lon":-118.244,"fact":["1953-01-01","Première liaison directe Los Angeles-Paris par TAI"],"id":"carte-facile-7"},{"mode":"carte","level":"facile","label":"Pékin","country":"Chine","lat":39.904,"lon":116.407,"fact":["1956-10-13","Ouverture d'une liaison régulière Paris-Pékin"],"id":"carte-facile-8"},{"mode":"carte","level":"facile","label":"Mexico","country":"Mexique","lat":19.433,"lon":-99.133,"fact":["1952-03-13","Vol de reconnaissance et record New York-Mexico"],"id":"carte-facile-9"},{"mode":"carte","level":"facile","label":"Buenos Aires","country":"Argentine","lat":-34.604,"lon":-58.382,"fact":["1927-11-14","Inauguration de Natal-Rio-Buenos Aires par l'Aéropostale"],"id":"carte-facile-10"},{"mode":"carte","level":"moyen","label":"Dakar","country":"Sénégal","lat":14.717,"lon":-17.468,"fact":["1923-05-03","CGEA prolonge sa ligne jusqu'à Dakar"],"id":"carte-moyen-1"},{"mode":"carte","level":"moyen","label":"Antananarivo","country":"Madagascar","lat":-18.879,"lon":47.508,"fact":["1934-07-29","Premier courrier Tananarive–Broken Hill par la Régie Malgache"],"id":"carte-moyen-2"},{"mode":"carte","level":"moyen","label":"Hô Chi Minh-Ville (Saïgon)","country":"Viêt Nam","lat":10.823,"lon":106.63,"fact":["1938-07-30","Premier vol commercial Hanoï-Saïgon"],"id":"carte-moyen-3"},{"mode":"carte","level":"moyen","label":"Nouméa","country":"Nouvelle-Calédonie","lat":-22.276,"lon":166.458,"fact":["1948-12-05","Ouverture de la ligne régulière Saigon-Nouméa"],"id":"carte-moyen-4"},{"mode":"carte","level":"moyen","label":"Papeete","country":"Polynésie française","lat":-17.535,"lon":-149.569,"fact":["1949-12-01","Ouverture de la ligne Nouméa-Papeete par la TRAPAS"],"id":"carte-moyen-5"},{"mode":"carte","level":"moyen","label":"Anchorage","country":"États-Unis","lat":61.218,"lon":-149.9,"fact":["1960-01-11","Autorisation pour Anchorage par le CAB"],"id":"carte-moyen-6"},{"mode":"carte","level":"moyen","label":"Johannesburg","country":"Afrique du Sud","lat":-26.204,"lon":28.047,"fact":["1956-05-12","Inauguration de la ligne Paris-Johannesburg par l'UAT"],"id":"carte-moyen-7"},{"mode":"carte","level":"moyen","label":"Téhéran","country":"Iran","lat":35.689,"lon":51.389,"fact":["1946-04-29","Ouverture de la ligne Paris-Téhéran"],"id":"carte-moyen-8"},{"mode":"carte","level":"moyen","label":"Lima","country":"Pérou","lat":-12.046,"lon":-77.043,"fact":["1958-03-13","Inauguration de la ligne Paris-Lima"],"id":"carte-moyen-9"},{"mode":"carte","level":"moyen","label":"Karachi","country":"Pakistan","lat":24.861,"lon":67.001,"fact":["1971-10-01","Ouverture de l'escale de Karachi par UTA"],"id":"carte-moyen-10"},{"mode":"carte","level":"difficile","label":"Niamey","country":"Niger","lat":13.512,"lon":2.125,"fact":["1935-04-17","Avenant pour l'exploitation Cotonou-Niamey et correspondances"],"id":"carte-difficile-1"},{"mode":"carte","level":"difficile","label":"N'Djamena","country":"Tchad","lat":12.113,"lon":15.049,"fact":["1950-08-25","Ouverture ligne Fort Lamy - Douala"],"id":"carte-difficile-2"},{"mode":"carte","level":"difficile","label":"Bangui","country":"République centrafricaine","lat":4.39,"lon":18.558,"fact":["1947-05-18","Nouvelle ligne Brazzaville-Bangui"],"id":"carte-difficile-3"},{"mode":"carte","level":"difficile","label":"Port-Louis","country":"Maurice","lat":-20.161,"lon":57.501,"fact":null,"id":"carte-difficile-4"},{"mode":"carte","level":"difficile","label":"Ouagadougou","country":"Burkina Faso","lat":12.371,"lon":-1.52,"fact":["1957-01-01","Desserte de Ouagadougou par la TAI"],"id":"carte-difficile-5"},{"mode":"carte","level":"difficile","label":"Libreville","country":"Gabon","lat":0.39,"lon":9.454,"fact":["1937-05-15","Premier vol Libreville-Dakar"],"id":"carte-difficile-6"},{"mode":"carte","level":"difficile","label":"Djibouti","country":"Djibouti","lat":11.588,"lon":43.145,"fact":["1939-06-01","Liaison Marseille-Djibouti"],"id":"carte-difficile-7"},{"mode":"carte","level":"difficile","label":"Natal","country":"Brésil","lat":-5.79,"lon":-35.21,"fact":["1927-11-14","Inauguration de Natal-Rio-Buenos Aires par l'Aéropostale"],"id":"carte-difficile-8"},{"mode":"carte","level":"difficile","label":"Shannon","country":"Irlande","lat":52.702,"lon":-8.918,"fact":["1957-05-18","Ouverture de la ligne Paris-Shannon"],"id":"carte-difficile-9"},{"mode":"carte","level":"difficile","label":"Phnom Penh","country":"Cambodge","lat":11.556,"lon":104.928,"fact":["1952-04-28","Nouvelle escale à Phnom Penh sur la ligne Paris-Saïgon"],"id":"carte-difficile-10"},{"mode":"annee","level":"facile","text":"Du 04 au 07 :\nLe F-BPVA, premier Boeing 747 reçu par Air France, effectue un vol d’expérimentation sur le parcours Paris / New York / Montréal / Paris auquel sont invités avec les spécialistes des directions opérationnelles quelques journalistes et des agents des différents services de la compagnie.","year":1970,"date":"1970-05-04","title":"Vol d'expérimentation du premier Boeing 747","id":"annee-facile-1"},{"mode":"annee","level":"facile","text":"La flamme olympique vient de battre un record : elle a atteint et maintenu pendant 55 minutes la vitesse de 600m/seconde entre Athènes et Paris, à bord du Concorde F-BVFA d'Air France. Enfermée dans un réceptacle, elle était alimentés par un carburant spécial mis au point par Air France pour éviter tout risque d'accident.","year":1991,"date":"1991-12-14","title":"La flamme olympique transportée par Concorde","id":"annee-facile-2"},{"mode":"annee","level":"facile","text":"A 11h29, le prototype 001de Concorde franchit pour la première fois le mur du son, pendant son 45ème vol, alors qu’il se trouve à 120 km environ au nord de Toulouse et à une altitude de 11000 mètres.\nIl effectue ensuite, pendant près de 9 minutes, un palier à la vitesse de Mach 1,05 soit 1150km/h.\nA la suite de ce vol M. André TURCAT, chef pilote directeur des essais en vol de Sud Aviation, déclare notamment « …L’avion s’est magnifiquement comporté. Nous n’auront pas de mal à continuer dans le supersonique… ».","year":1969,"date":"1969-10-01","title":"Le Concorde franchit le mur du son","id":"annee-facile-3"},{"mode":"annee","level":"facile","text":"Avec 122 passagers à bord, le boeing Intercontinental d’Air France « château de Rambouillet » relie Montréal à Paris en 5 H 40 réalisant ainsi le temps le plus court sur ce parcours en vol commercial.\nLa veille, la Caravelle « Gascogne » assurant la liaison régulière Paris – Francfort, effectuait le voyage dans le temps record de 47 minutes.","year":1960,"date":"1960-07-17","title":"Records de vitesse transatlantique et européenne","id":"annee-facile-4"},{"mode":"annee","level":"facile","text":"Ouverture de Paris-Mexico en Concorde d’Air France à raison de deux vols par semaine, en prolongement de deux vols Paris-Washington. La durée du voyage est de 4 h 40 mn, y compris un temps d’escale de 50 mn à Washington. Ce temps de voyage est à comparer à 13 h 30 mn, durée du vol subsonique le plus rapide dans le sens Paris-Mexico, et à 12 h 20 mn, durée du vol subsonique dans le sens Mexico-Paris.","year":1978,"date":"1978-09-20","title":"Ouverture de la ligne Paris-Mexico en Concorde","id":"annee-facile-5"},{"mode":"annee","level":"facile","text":"En application du programme d’expérimentation de la Caravelle par la Compagnie Nationale (voir éphé.73), le biréacteur de la SNCASE est utilisé par Air France pour le transport de fret entre Paris et Alger. Le voyage s’effectue sans escale et permet d’étudier les conditions techniques dans lesquelles pourra être assuré dans quelques mois le transport des passagers.","year":1956,"date":"1956-06-20","title":"Expérimentation de la Caravelle en fret","id":"annee-facile-6"},{"mode":"annee","level":"facile","text":"Pour son arrivée à Air France, l’Airbus A320 effectue un vol de 30 mn au départ de Roissy, marqué par une remontée des Champs Elysées à 500 m d’altitude, avec J. Chirac premier ministre à son bord. Il est mis en service le 18 avril sur Paris-Dusseldorf-Berlin.","year":1988,"date":"1988-03-28","title":"Arrivée de l'Airbus A320 chez Air France","id":"annee-facile-7"},{"mode":"annee","level":"moyen","text":"Danièle Décuré fait une entrée remarquée à Air France, devenant la première femme pilote de ligne de la Compagnie.","year":1975,"date":"1975-04-07","title":"Première femme pilote de ligne chez Air France","id":"annee-moyen-1"},{"mode":"annee","level":"moyen","text":"Pour la première fois dans l’histoire de la télévision, les téléspectateurs suivent en direct, cet après-midi, une émission de variétés réalisée à bord d’un DC-8 d’UTA sur le parcours Paris / Marseille / Paris. A cette occasion, le DC-8 a été aménagé en studio d’émission et en véritable salle de spectacle. Outre les installations techniques, une scène a été construite à bord, sur laquelle évoluent les vedettes. Un piano et un orgue sont également installés.","year":1966,"date":"1966-01-02","title":"Première émission de télévision en direct d'un avion","id":"annee-moyen-2"},{"mode":"annee","level":"moyen","text":"L’éléphanteau ZIMBO offert par l’abbé FULBERT YOULOU, premier ministre du Congo, au Président EISENHOWER est transporté de Brazzaville à Paris sur un avion cargo d’Air France .","year":1959,"date":"1959-09-15","title":"Transport par Air France d'un éléphanteau pour Eisenhower","id":"annee-moyen-3"},{"mode":"annee","level":"moyen","text":"Air France inaugure la ligne Paris-New York, via Shannon et Gander, assurée par le DC-4 \"Ciel Ile de France\" F-BBDJ, en 23 heures et 45 minutes. Cette ligne est baptisée ligne du « Ruban Etoilé ».","year":1946,"date":"1946-06-24","title":"Inauguration de la ligne Paris-New York","id":"annee-moyen-4"},{"mode":"annee","level":"moyen","text":"Air France, qui détenait 36,53% du capital d’Air Inter, prend le contrôle d’UTA et des 35,80% que cette dernière détenait dans le capital d’Air Inter. Air France possède désormais, avec 72,33 %, la majorité du capital d’Air Inter.","year":1990,"date":"1990-01-12","title":"Prise de contrôle d'UTA par Air France","id":"annee-moyen-5"},{"mode":"annee","level":"moyen","text":"A 20h02, les réservations d’Air France de Paris et de New York entrent en contact téléphonique, en utilisant le satellite Telstar comme relais, pour réserver la place d’un passager.\nC’est la première liaison de cette nature réalisée dans le monde.","year":1962,"date":"1962-08-08","title":"Première réservation via le satellite Telstar","id":"annee-moyen-6"},{"mode":"annee","level":"moyen","text":"Le Lockheed Super-Constellation L.I049.C, immatriculé F.BGNA, le premier des dix appareils de ce type commandés par Air France, a effectué son premier vol régulier sur l’Atlantique. Ayant décollé d’Orly à 22h., l’appareil s’est posé à New- York International, le lendemain matin à 8h.06 locales, après deux heures d’escale à Shannon, couvrant le parcours en 16h.06. L’appareil était aménagé en version « Parisien spécial » avec 40 fauteuils couchettes et un double salon. 30 passagers étaient à bord.","year":1953,"date":"1953-07-16","title":"Premier vol transatlantique du Super Constellation","id":"annee-moyen-7"},{"mode":"annee","level":"difficile","text":"Vers 01 h 00, heure locale de Paris, les forces américaines, britanniques, koweïtiennes et saoudiennes ont lancé une offensive aérienne contre des objectifs irakiens. Les forces françaises ont participé, plus tard dans la matinée, à une offensive aérienne sur le Koweït, occupé par l'Irak.","year":1991,"date":"1991-01-16","title":"Participation française au conflit dans le Golfe","id":"annee-difficile-1"},{"mode":"annee","level":"difficile","text":"Le ministre des Transports, Gilles de Robien, annonce que le projet de loi de privatisation d'Air France sera présenté au Parlement dans les prochaines semaines. Il déclare également que l'Etat pourrait conserver 20 à 25 % du capital mais précise que \" le pourcentage n'est pas encore fixé par le gouvernement \".\nJean-Cyril Spinetta informera le comité central d'entreprise, qui se réunit les 11 et 12 septembre, de l'annonce par le gouvernement de la poursuite de l'ouverture d capital de la Compagnie.","year":2002,"date":"2002-09-10","title":"Projet de privatisation d'Air France","id":"annee-difficile-2"},{"mode":"annee","level":"difficile","text":"Première liaison aérienne, avec transport de courrier, La Réunion-Ile Maurice, en Potez 43 par deux pilotes de l'Aéroclub de la Réunion, Samat et Lemerle.","year":1933,"date":"1933-11-10","title":"Première liaison Réunion–Maurice en Potez 43","id":"annee-difficile-3"},{"mode":"annee","level":"difficile","text":"La T.A.I. a reçu le premier des trois Douglas DC.6.B. qu’elle a commandés aux Etats-Unis.\nLe second appareil a réalisé lors de son convoyage une performance digne d’intérêt : les 28 et 29 Mai, il a effectué sans escale le trajet Santa- Monica (Californie)/Orly, survolant le Winnipeg (Canada), la Baie d’Hudson et la pointe méridionale du Groënland. Les 9900 km du parcours ont été franchis en 20h28 de vol.","year":1953,"date":"1953-05-05","title":"Premier Douglas DC-6B pour la TAI","id":"annee-difficile-4"},{"mode":"annee","level":"difficile","text":"Le courrier à destination de Madagascar est amené pour la première fois par un avion de la Régie Air Afrique de la ligne Alger-Brazzaville jusqu'à Brooken Hill (Rhodésie du Nord) où un appareil Bloch de la Régie Malgache l'achemine jusqu'à Madagascar. Ainsi est opéré la jonction des lignes Alger-Brazzaville et Brooken Hill-Tananarive, ouvertes après des années d'efforts, la première par Jean Dagnaux et la seconde par le commandant René Lefèvre.","year":1935,"date":"1935-04-27","title":"Jonction des lignes Alger-Brazzaville et Broken Hill-Tananarive","id":"annee-difficile-5"},{"mode":"annee","level":"difficile","text":"La C.G.E.A. prolonge sa ligne jusqu'à Dakar. 3 Breguet XIV s'envolent de Casablanca, pilotés par Delrieu, Cueille et Hamm, qui relient Dakar. La nouvelle ligne dessert les escales suivantes : Toulouse, Perpignan, Barcelone, Alicante, Malaga, Tanger, Rabat, Casablanca, Agadir, Cap-Juby, Villa Cisnerose, Port-Etienne, Nouaktchott, Saint-Louis et Dakar. Le réseau Latécoère dessert également une ligne Bordeaux, Bayonne, Valladolid, Lisbonne, ainsi que les escales de Palma, Alger, Oran et les Iles Canaries.","year":1923,"date":"1923-05-03","title":"CGEA prolonge sa ligne jusqu'à Dakar","id":"annee-difficile-6"},{"mode":"annee","level":"difficile","text":"Le Super-Starliner F-BHBK d’Air France, piloté par le Commandant Lesieur, effectue le trajet sans escale New-York – Paris dans le temps record, pour la Compagnie Nationale de 9h32 minutes, soit à une vitesse de 622 kilomètres à l’heure. La P.A.A. détient actuellement le record de la traversée avec un vol en DC 7 B de 9h12 minutes.","year":1957,"date":"1957-12-08","title":"Record New York-Paris en Super-Starliner","id":"annee-difficile-7"},{"mode":"ordre","level":"facile","items":[{"year":1958,"date":"1958-01-26","title":"Inauguration de la ligne transpolaire Paris-Tokyo"},{"year":1978,"date":"1978-08-22","title":"Record de vitesse Paris-New York en Concorde"},{"year":1992,"date":"1992-09-23","title":"Projet de fusion entre Air France et UTA"},{"year":2008,"date":"2008-03-11","title":"Projet de rapprochement entre Air France-KLM et Alitalia"}],"id":"ordre-facile-1"},{"mode":"ordre","level":"facile","items":[{"year":1925,"date":"1925-11-07","title":"De Pinedo boucle son raid Rome-Melbourne-Tokyo-Rome"},{"year":1939,"date":"1939-07-14","title":"Traversée transatlantique New York-Biscarosse réussie"},{"year":1962,"date":"1962-08-08","title":"Première réservation via le satellite Telstar"},{"year":1995,"date":"1995-08-17","title":"Record mondial de vitesse autour du monde en Concorde"}],"id":"ordre-facile-2"},{"mode":"ordre","level":"facile","items":[{"year":1946,"date":"1946-06-24","title":"Inauguration de la ligne Paris-New York"},{"year":1960,"date":"1960-01-01","title":"Création de la Ligne Tour du Monde"},{"year":2003,"date":"2003-06-27","title":"Dernier vol du Concorde F-BVFC"},{"year":2019,"date":"2019-04-04","title":"Hommage au commandant Pierre Chanoine-Martiel"}],"id":"ordre-facile-3"},{"mode":"ordre","level":"facile","items":[{"year":1933,"date":"1933-08-31","title":"Premiers vols quotidiens de la nouvelle Air France"},{"year":1945,"date":"1945-06-26","title":"Nationalisation de l'aviation civile française"},{"year":1990,"date":"1990-10-29","title":"Retour des otages français d'Irak et du Koweït"},{"year":2003,"date":"2003-06-14","title":"Dons du Concorde F-BTSD au musée"}],"id":"ordre-facile-4"},{"mode":"ordre","level":"facile","items":[{"year":1938,"date":"1938-08-23","title":"Vol d'étude transatlantique nord"},{"year":1953,"date":"1953-07-16","title":"Premier vol transatlantique du Super Constellation"},{"year":1975,"date":"1975-04-07","title":"Première femme pilote de ligne chez Air France"},{"year":2004,"date":"2004-04-20","title":"Fusion entre Air France et KLM"}],"id":"ordre-facile-5"},{"mode":"ordre","level":"moyen","items":[{"year":1959,"date":"1959-05-01","title":"Vol inaugural de la Caravelle"},{"year":1981,"date":"1981-03-28","title":"Dernier vol commercial de la Caravelle"},{"year":1993,"date":"1993-05-26","title":"Projet de loi sur la privatisation d'Air France"},{"year":2001,"date":"2001-11-07","title":"Reprise des vols commerciaux Concorde"}],"id":"ordre-moyen-1"},{"mode":"ordre","level":"moyen","items":[{"year":1939,"date":"1939-07-14","title":"Traversée de l'Atlantique par Air France Transatlantique"},{"year":1958,"date":"1958-01-26","title":"Vol d'essai Paris-Tokyo par l'Arctique"},{"year":1976,"date":"1976-04-09","title":"Inauguration de la ligne Concorde Paris-Caracas"},{"year":1998,"date":"1998-02-23","title":"Détails de la privatisation d'Air France"}],"id":"ordre-moyen-2"},{"mode":"ordre","level":"moyen","items":[{"year":1960,"date":"1960-04-21","title":"Accord pour un projet de supersonique franco-français"},{"year":1967,"date":"1967-12-11","title":"Sortie d'atelier officielle du prototype Concorde"},{"year":1992,"date":"1992-10-12","title":"Record mondial de vitesse autour du monde pour Concorde"},{"year":2002,"date":"2002-02-07","title":"Dépôt de bilan d'Air Afrique"}],"id":"ordre-moyen-3"},{"mode":"ordre","level":"moyen","items":[{"year":1921,"date":"1921-11-20","title":"Première ligne régulière en hydravion Antibes-Ajaccio"},{"year":1973,"date":"1973-12-06","title":"Premier vol du premier Concorde de série"},{"year":1987,"date":"1987-11-05","title":"Inauguration de la ligne Paris - London City"},{"year":1999,"date":"1999-01-26","title":"Ouverture du capital d'Air France en Bourse"}],"id":"ordre-moyen-4"},{"mode":"ordre","level":"moyen","items":[{"year":1925,"date":"1925-11-12","title":"Bossoutrot bat sept records du monde sur Super Goliath"},{"year":1954,"date":"1954-11-22","title":"Records de vitesse en Super Constellation"},{"year":1970,"date":"1970-12-18","title":"Création d'Airbus Industrie"},{"year":2004,"date":"2004-05-05","title":"Fusion officielle d'Air France et KLM"}],"id":"ordre-moyen-5"},{"mode":"ordre","level":"difficile","items":[{"year":1933,"date":"1933-08-30","title":"Dépôt des statuts et équipe dirigeante d'Air France"},{"year":1955,"date":"1955-12-13","title":"Record Paris-Montréal en Super Constellation"},{"year":1958,"date":"1958-04-01","title":"Lancement de la classe Économique sur l'Atlantique Nord"},{"year":1966,"date":"1966-12-06","title":"Record de vitesse transpolaire Paris-Tokyo"}],"id":"ordre-difficile-1"},{"mode":"ordre","level":"difficile","items":[{"year":1994,"date":"1994-05-18","title":"Accord de partenariat entre Air France et JAL"},{"year":2008,"date":"2008-06-18","title":"Engagement d'Air France pour la forêt à Madagascar"},{"year":2015,"date":"2015-03-19","title":"Premier vol pour les nouvelles cabines moyen-courrier"},{"year":2018,"date":"2018-12-18","title":"Royal Air Maroc, IATA, Airbus et aéroports chinois"}],"id":"ordre-difficile-2"},{"mode":"ordre","level":"difficile","items":[{"year":1960,"date":"1960-06-20","title":"Mise en service des Boeing vers l'Atlantique central"},{"year":1967,"date":"1967-12-19","title":"Arrivée de la Flamme Olympique à Orly"},{"year":1994,"date":"1994-01-21","title":"Nouveau design intérieur pour le Concorde Air France"},{"year":1998,"date":"1998-12-10","title":"Décret de privatisation partielle d'Air France"}],"id":"ordre-difficile-3"},{"mode":"ordre","level":"difficile","items":[{"year":1995,"date":"1995-09-11","title":"Lancement du nouveau produit long-courrier d'Air France"},{"year":1998,"date":"1998-12-12","title":"Lancement du nouveau projet d'entreprise"},{"year":2002,"date":"2002-10-01","title":"Jubilé de la ligne Paris-Tokyo et menus Guy Martin"},{"year":2017,"date":"2017-07-27","title":"Air France-KLM renforce ses partenariats stratégiques"}],"id":"ordre-difficile-4"},{"mode":"ordre","level":"difficile","items":[{"year":1967,"date":"1967-07-25","title":"Accord intergouvernemental sur l'Airbus européen"},{"year":1978,"date":"1978-09-20","title":"Ouverture de la ligne Paris-Mexico en Concorde"},{"year":1997,"date":"1997-12-11","title":"Fermeture de la filiale Air Charter"},{"year":2003,"date":"2003-09-28","title":"Nouvelles cabines Première et Affaires Air France"}],"id":"ordre-difficile-5"},{"mode":"nombre","level":"facile","prompt":"En 1956, Air France ouvre un troisième service hebdomadaire Paris-Tokyo en Super Constellation. Combien d'heures dure le voyage, escales comprises ?","answer":45,"unit":"heures","source":"Air France ouvre un 3ème service hebdomadaire Paris-Tokyo en Super Constellation. Ce service fera escale à Francfort à partir du 29 juin. L’itinéraire devient Paris-Francfort-Beyrouth-Karachi-Calcutta-Bangkok-Saigon-Manille-Tokyo, soit 15.640 km. La durée du voyage est de 45 heures, dont 37 h 50 de vol. Les départs ont lieu le vendredi de Paris et le samedi de Tokyo.","date":"1956-06-22","title":"Nouveau service Paris-Tokyo en Super Constellation","id":"nombre-facile-1"},{"mode":"nombre","level":"facile","prompt":"Le premier vol commercial d'Air France vers la Nouvelle-Calédonie : combien de jours dure ce voyage en DC-4 ?","answer":6,"unit":"jours","source":"Le premier vol commercial d’Air France à destination de la Nouvelle-Calédonie vient de décoller pour un voyage qui va durer 6 jours. Escales à Tunis, Le Caire, Bassorah (Irak), Karachi (Pakistan), Calcutta, Saigon, Batavia, Port Darwin et Brisbane (Australie).\nLe 27 Septembre, le DC-4 F-BELJ atterrit sur la piste de Tontouta.","date":"1949-09-21","title":"Premier vol commercial vers la Nouvelle-Calédonie","id":"nombre-facile-2"},{"mode":"nombre","level":"facile","prompt":"Premier vol Paris-Tokyo « non-stop » d'Air France en Boeing 747. Combien d'heures dure-t-il dans le sens Paris-Tokyo ?","answer":11.67,"unit":"heures","source":"1er vol \"non-stop\" Paris-Tokyo, le \"Soleil Levant\", d’Air France, en Boeing 747. Ce vol, le 8ème à relier chaque semaine Paris à Tokyo, met les deux capitales à 11h40 dans le sens Paris-Tokyo et à 12h40 dans l'autre sens.","date":"1986-04-04","title":"Premier vol sans escale Paris-Tokyo","id":"nombre-facile-3"},{"mode":"nombre","level":"facile","prompt":"Un commandant de bord Concorde bat le record Paris-New York. En combien de minutes (environ) ?","answer":210,"unit":"minutes","source":"Fernand Andréani, CDB Concorde d'Air France bat le record de vitesse Paris-New York en 3h 30 min 11s. Il ravit ce record au CDB Chanoine qui avait battu le précédent record quatre jours auparavant sur Paris-Washington en 3h 35 min 15s.","date":"1978-08-22","title":"Record de vitesse Paris-New York en Concorde","id":"nombre-facile-4"},{"mode":"nombre","level":"facile","prompt":"Le TGV Sud-Est est mis en service et fait concurrence à Air Inter. En combien de minutes met-il Lyon à Paris ?","answer":160,"unit":"minutes","source":"La SNCF, actionnaire d'Air Inter, met en service le TGV Sud-Est. Lyon est désormais à 2h 40 min de Paris, sérieuse concurrence pour Air Inter.","date":"1981-11-27","title":"Mise en service du TGV Sud-Est","id":"nombre-facile-5"},{"mode":"nombre","level":"facile","prompt":"Ouverture de Paris-Caracas en Concorde, avec escale aux Açores. Combien d'heures de voyage ?","answer":6,"unit":"heures","source":"Ouverture de la ligne Paris-Caracas en Concorde par Air France. 7.167 km en 6h avec escale aux Açores. Il faut 11h35 min en avion subsonique.","date":"1976-04-09","title":"Inauguration de la ligne Concorde Paris-Caracas","id":"nombre-facile-6"},{"mode":"nombre","level":"moyen","prompt":"Air France inaugure une desserte directe Fort-de-France-Paris en Boeing 747. Combien de sièges compte l'appareil ?","answer":435,"unit":"sièges","source":"Air France inaugure une desserte directe entre Fort de France et Paris en B747 dotés de 435 sièges.","date":"1974-06-25","title":"Inauguration de la liaison directe Fort-de-France-Paris","id":"nombre-moyen-1"},{"mode":"nombre","level":"moyen","prompt":"Air Inter inaugure sa première ligne intérieure, Paris-Strasbourg, en DC-3. Combien de minutes dure la liaison ?","answer":105,"unit":"minutes","source":"Air Inter inaugure sa première ligne intérieure, Paris-Strasbourg. Vol inaugural en liaison avec le Parlement Européen, effectué en DC-3 du SGACC immatriculé F-BFGX, sous N° de ligne IT 011. La liaison est quotidienne sauf le dimanche, en 1 h 45mn.","date":"1958-03-17","title":"Première ligne Air Inter : Paris-Strasbourg","id":"nombre-moyen-2"},{"mode":"nombre","level":"moyen","prompt":"Une Caravelle d'Air France fait un vol plané, réacteurs à l'extrême ralenti, entre Paris et Dijon. Sur combien de kilomètres ?","answer":265,"unit":"km","source":"La Caravelle F-BHRA \"Alsace\" d’Air France effectue un vol plané de 265 km entre Paris et Dijon avec 35 personnes à bord. Parti à la verticale de Paris à 11.700 m d’altitude, avec ses réacteurs à l’extrême ralenti, l’appareil se rend dans ces conditions jusqu’à Dijon qu’il survole à 1.200 mètres de hauteur.","date":"1959-04-16","title":"Vol plané spectaculaire d'une Caravelle","id":"nombre-moyen-3"},{"mode":"nombre","level":"moyen","prompt":"Inauguration de la ligne Toulouse-Rabat en Breguet XIV, pour Latécoère. Combien d'heures dure le trajet ?","answer":32,"unit":"heures","source":"1 et 2, Inauguration de la ligne Toulouse-Rabat (Toulouse-Barcelone-Alicante-Malaga-Rabat par Didier Daurat, pilote, en Breguet XIV), pour le compte de la société des Lignes Aériennes Latécoère. Durée du trajet 32 heures, soit 55 km/h. Prix : Toulouse-Barcelone 390 F, Toulouse-Tanger 1100 F et Toulouse-Rabat 1300 F. Appareils : Breguet et Salmson.","date":"1919-09-01","title":"Inauguration de la ligne Toulouse-Rabat par Daurat","id":"nombre-moyen-4"},{"mode":"nombre","level":"moyen","prompt":"Le premier DC-10 d'U.T.A. est mis en service sur Paris-Nouméa. Combien de passagers peut-il emporter ?","answer":273,"unit":"passagers","source":"Le premier DC-10 d’U.T.A. est mis en service sur la ligne Paris/Nouméa par U.T.A. Il offre une charge marchande de 40 tonnes : 273 passagers et 21 tonnes de fret.","date":"1972-01-01","title":"Mise en service du premier DC-10 d'UTA","id":"nombre-moyen-5"},{"mode":"nombre","level":"moyen","prompt":"Air France relie Paris à Tokyo sans escale en Boeing 747-400. Combien de sièges compte cet appareil ?","answer":371,"unit":"sièges","source":"Air France relie désormais, tous les jours, Paris à Tokyo en 11 heures 40 de vol sans escale, en Boeing 747-400, équipé de 371 sièges (16 en Première classe, 104 en classe \"Le Club\" et 251 en classe Economique). Ce nouveau vol porte la desserte de la ligne Paris-Tokyo à 12 vols hebdomadaires.","date":"1991-04-09","title":"Nouveau vol direct vers Tokyo","id":"nombre-moyen-6"},{"mode":"nombre","level":"moyen","prompt":"Conférence de presse du président d'Air France sur les résultats de 1952 : combien de passagers la compagnie a-t-elle transportés cette année-là ?","answer":1075000,"unit":"passagers","source":"Conférence de presse de Max Hymans, président d’Air France sur les résultats de 1952 et les perspectives 1953. Le nombre de passagers (1.075.000) a été en augmentation de 9.4% sur celui de l’année précédente tandis que celui des passagers- kilomètres (1.494.000.000.) accusait une progression de plus de 1.6%.","date":"1953-02-12","title":"Conférence de presse de Max Hymans sur les résultats 1952","id":"nombre-moyen-7"},{"mode":"nombre","level":"difficile","prompt":"Air France fait immatriculer son premier Caudron Goéland. Combien d'exemplaires de cet appareil ont été construits au total ?","answer":1702,"unit":"exemplaires","source":"Air France fait immatriculer son premier Caudron 440 Goéland, le F-AOYP. Environ 180 Caudron Goéland (sur 1702 exemplaires construits) furent exploités par Air France, Air Bleu, le SCLAM et la Régie Air Afrique.","date":"1937-07-08","title":"Immatriculation du premier Caudron Goéland d'Air France","id":"nombre-difficile-1"},{"mode":"nombre","level":"difficile","prompt":"Le premier Douglas DC-4 d'Air France est baptisé « Ciel de Bretagne ». Combien d'exemplaires furent exploités par Air France, la TAI et l'UAT ?","answer":67,"unit":"exemplaires","source":"Air France fait baptiser « Ciel de Bretagne » son premier Douglas DC.4 à Santa Monica par Dorothy Lamour. 67 exemplaires de cet appareil furent exploités essentiellement par Air France, mais aussi par la TAI et l’UAT, .","date":"1947-04-04","title":"Baptême du premier Douglas DC-4 d'Air France","id":"nombre-difficile-2"},{"mode":"nombre","level":"difficile","prompt":"Un Super Starliner d'Air France décolle de Burbank pour rallier Orly sans escale. Quelle distance, en kilomètres ?","answer":9343,"unit":"km","source":"Le huitième des dix Super – Starliner livrés par lockheed à Air France atterrit à Orly après un vol sans escale de 18h03. Actuellement, six avions de ce type sont en service sur les lignes transatlantiques de la Compagnie.","date":"1957-09-27","title":"Livraison d'un nouveau Super-Starliner","id":"nombre-difficile-3"},{"mode":"nombre","level":"difficile","prompt":"Record sur la ligne Paris-Tananarive en Caudron Simoun, en deux jours et neuf heures. Quelle distance, en kilomètres ?","answer":8665,"unit":"km","source":"Record sur la ligne Paris-Tananarive par Génin, pilote d'Air France, et André Robert, sur avion Caudron \"Simoun\", moteur Renault de 180cv, avec un réservoir supplémentaire. 8.665 km en deux jours 9 heures et 44 secondes. Départ du Bourget le 18 à 22h38, arrivée à Tananarive le 21, via Syrte, Assouan, Juba et Mozambique.","date":"1935-12-18","title":"Record Paris-Tananarive en Caudron Simoun","id":"nombre-difficile-4"},{"mode":"nombre","level":"difficile","prompt":"Bossoutrot, à bord d'un Super Goliath chargé de 4 000 kg, bat sept records du monde. À quelle altitude monte-t-il, en mètres ?","answer":4990,"unit":"mètres","source":"Bossoutrot à bord d'un Super Goliath vole 2h 19min 16s et monte à 4.990 m avec 4.000 kg de charge, battant sept records du monde.","date":"1925-11-12","title":"Bossoutrot bat sept records du monde sur Super Goliath","id":"nombre-difficile-5"},{"mode":"nombre","level":"difficile","prompt":"Premier vol régulier du Jet Cargo DC-8F d'UTA, sur Paris-Abidjan-Douala-Fort Lamy. Combien de tonnes de fret emporte-t-il ?","answer":35,"unit":"tonnes","source":"Pour son premier vol régulier, le nouveau Jet Cargo DC-8F d’UTA, arrivé au Bourget le 10 novembre, assure la ligne Paris / Abidjan / Douala / Fort Lamy. Equipé dans sa version tout-cargo il transporte pour ce premier vol 35 tonnes de fret, dont 1.5 tonnes de presse, 1 tonne de courrier et 8 tonnes de vivres frais.","date":"1965-12-02","title":"Premier vol du Jet Cargo DC-8F d'UTA","id":"nombre-difficile-6"},{"mode":"nombre","level":"difficile","prompt":"Le satellite Télécom 1 voyage de Toulouse à Cayenne dans un Boeing 747 cargo d'Air France. Combien de tonnes pèse l'ensemble du matériel (250 caisses) ?","answer":55,"unit":"tonnes","source":"Télécom 1, le premier satellite français de télécommunication, est embarqué à bord d’un vol spécial d’Air France effectué en B747 cargo qui relie directement Poulouse à Cayenne. L’ensemble du matériel, d’une valeur supérieure à 600 millions de francs, qui a nécessité l’utilisation de 250 caisses, pèse 55 tonnes.","date":"1984-06-19","title":"Transport du satellite Télécom 1","id":"nombre-difficile-7"},{"mode":"texte","level":"facile","prompt":"Quel avion ?","masked":"A Toulouse, le ▒▒▒ de série N°5 est remis à Air France. Le F-BVFA est le premier avion supersonique remis à une compagnie aérienne. Il sera mis en service le 21.01.76 sur Paris-Rio.","full":"A Toulouse, le Concorde de série N°5 est remis à Air France. Le F-BVFA est le premier avion supersonique remis à une compagnie aérienne. Il sera mis en service le 21.01.76 sur Paris-Rio.","answer":"Concorde","aliases":["Concorde"],"date":"1975-12-19","title":"Livraison du premier Concorde à Air France","id":"texte-facile-1"},{"mode":"texte","level":"facile","prompt":"Quel avion ?","masked":"Du 04 au 07 :\nLe F-BPVA, premier ▒▒▒ reçu par Air France, effectue un vol d’expérimentation sur le parcours Paris / New York / Montréal / Paris auquel sont invités avec les spécialistes des directions opérationnelles quelques journalistes et des agents des différents services de la compagnie.","full":"Du 04 au 07 :\nLe F-BPVA, premier Boeing 747 reçu par Air France, effectue un vol d’expérimentation sur le parcours Paris / New York / Montréal / Paris auquel sont invités avec les spécialistes des directions opérationnelles quelques journalistes et des agents des différents services de la compagnie.","answer":"Boeing 747","aliases":["Boeing 747","747","B747"],"date":"1970-05-04","title":"Vol d'expérimentation du premier Boeing 747","id":"texte-facile-2"},{"mode":"texte","level":"facile","prompt":"Quel aviateur ?","masked":"▒▒▒ et Negrin relient, pour la première fois sans escale, Toulouse à Dakar, pour le compte de l'Aéropostale.","full":"Mermoz et Negrin relient, pour la première fois sans escale, Toulouse à Dakar, pour le compte de l'Aéropostale.","answer":"Mermoz","aliases":["Mermoz","Jean Mermoz"],"date":"1927-10-11","title":"Mermoz et Négrin relient Toulouse à Dakar","id":"texte-facile-3"},{"mode":"texte","level":"facile","prompt":"Quel président de la République ?","masked":"▒▒▒, Président de la république française, se rend à Tokyo à bord d’un Concorde d’Air France.","full":"Valéry Giscard d’Estaing, Président de la république française, se rend à Tokyo à bord d’un Concorde d’Air France.","answer":"Giscard d'Estaing","aliases":["Giscard d'Estaing","Giscard","Valéry Giscard d'Estaing"],"date":"1979-06-01","title":"Voyage présidentiel à Tokyo en Concorde","id":"texte-facile-4"},{"mode":"texte","level":"facile","prompt":"Quel général ?","masked":"Le général ▒▒▒, président de la République, déclare dans une allocution radiodiffusée : « Nous nous unissons à l’Angleterre pour construire le premier avion de transport supersonique du monde ; nous sommes prêts à étendre à d’autres types d’appareils civils et militaires cette collaboration franco-britannique ».\n(Concorde)","full":"Le général de GAULLE, président de la République, déclare dans une allocution radiodiffusée : « Nous nous unissons à l’Angleterre pour construire le premier avion de transport supersonique du monde ; nous sommes prêts à étendre à d’autres types d’appareils civils et militaires cette collaboration franco-britannique ».\n(Concorde)","answer":"de Gaulle","aliases":["de Gaulle","Charles de Gaulle","Gaulle"],"date":"1965-04-27","title":"Déclaration du Général de Gaulle sur le Concorde","id":"texte-facile-5"},{"mode":"texte","level":"facile","prompt":"Quel acteur ?","masked":"▒▒▒, héros des séries télévisées \"Le Saint\" et \"Ivanhoe\", est le huit millionième passager à utiliser une Caravelle d'Air France.","full":"Roger Moore, héros des séries télévisées \"Le Saint\" et \"Ivanhoe\", est le huit millionième passager à utiliser une Caravelle d'Air France.","answer":"Roger Moore","aliases":["Roger Moore","Moore"],"date":"1964-01-01","title":"Roger Moore, 8 millionième passager Caravelle","id":"texte-facile-6"},{"mode":"texte","level":"facile","prompt":"Quel train ?","masked":"La SNCF, actionnaire d'Air Inter, met en service le ▒▒▒. Lyon est désormais à 2h 40 min de Paris, sérieuse concurrence pour Air Inter.","full":"La SNCF, actionnaire d'Air Inter, met en service le TGV Sud-Est. Lyon est désormais à 2h 40 min de Paris, sérieuse concurrence pour Air Inter.","answer":"TGV","aliases":["TGV","TGV Sud-Est"],"date":"1981-11-27","title":"Mise en service du TGV Sud-Est","id":"texte-facile-7"},{"mode":"texte","level":"facile","prompt":"Quel service ?","masked":"La réservation des places sur les vols d'Air France est désormais possible directement sur ▒▒▒. Air France devient ainsi la première compagnie au monde à proposer un tel service.","full":"La réservation des places sur les vols d'Air France est désormais possible directement sur Minitel. Air France devient ainsi la première compagnie au monde à proposer un tel service.","answer":"Minitel","aliases":["Minitel"],"date":"1989-05-31","title":"Réservation Air France sur Minitel","id":"texte-facile-8"},{"mode":"texte","level":"facile","prompt":"Quel avion ?","masked":"Le gouvernement français fait connaître, par un communiqué officiel, qu’il a pris la décision de principe de participer au projet de construction de l’avion « ▒▒▒ ».\nIl est précisé que les autorités allemandes ont été informées de cette décision et que les deux gouvernements souhaitent que la Grande-Bretagne accepte de ses joindre à eux pour la réalisation de ce projet européen.","full":"Le gouvernement français fait connaître, par un communiqué officiel, qu’il a pris la décision de principe de participer au projet de construction de l’avion « Airbus ».\nIl est précisé que les autorités allemandes ont été informées de cette décision et que les deux gouvernements souhaitent que la Grande-Bretagne accepte de ses joindre à eux pour la réalisation de ce projet européen.","answer":"Airbus","aliases":["Airbus"],"date":"1969-03-14","title":"Participation française au projet Airbus","id":"texte-facile-9"},{"mode":"texte","level":"facile","prompt":"Quelle ville ?","masked":"Air France ouvre un 3ème service hebdomadaire Paris-▒▒▒ en Super Constellation. Ce service fera escale à Francfort à partir du 29 juin. L’itinéraire devient Paris-Francfort-Beyrouth-Karachi-Calcutta-Bangkok-Saigon-Manille-▒▒▒, soit 15.640 km. La durée du voyage est de 45 heures, dont 37 h 50 de vol. Les départs ont lieu le vendredi de Paris et le samedi de ▒▒▒.","full":"Air France ouvre un 3ème service hebdomadaire Paris-Tokyo en Super Constellation. Ce service fera escale à Francfort à partir du 29 juin. L’itinéraire devient Paris-Francfort-Beyrouth-Karachi-Calcutta-Bangkok-Saigon-Manille-Tokyo, soit 15.640 km. La durée du voyage est de 45 heures, dont 37 h 50 de vol. Les départs ont lieu le vendredi de Paris et le samedi de Tokyo.","answer":"Tokyo","aliases":["Tokyo"],"date":"1956-06-22","title":"Nouveau service Paris-Tokyo en Super Constellation","id":"texte-facile-10"},{"mode":"texte","level":"moyen","prompt":"Quel avion ?","masked":"Le ▒▒▒ F-BGNO piloté par le commandant Richert vient de couvrir les 519 kilomètres séparant Stokholm de Copenhague en 58 minutes réalisant ainsi la liaison commerciale la plus rapide jusqu'à ce jour entre les deux villes. Le temps moyen de vol prévu à l’arrêt est de 1 heure 20.","full":"Le Vickers Viscount F-BGNO piloté par le commandant Richert vient de couvrir les 519 kilomètres séparant Stokholm de Copenhague en 58 minutes réalisant ainsi la liaison commerciale la plus rapide jusqu'à ce jour entre les deux villes. Le temps moyen de vol prévu à l’arrêt est de 1 heure 20.","answer":"Vickers Viscount","aliases":["Vickers Viscount","Viscount"],"date":"1955-04-18","title":"Record de vitesse Stockholm-Copenhague en Viscount","id":"texte-moyen-1"},{"mode":"texte","level":"moyen","prompt":"Quel avion ?","masked":"Air France met ses ▒▒▒ en service sur la ligne Paris-Tokyo par la route des Indes à raison de trois vols hebdomadaires : le mardi via Calcutta, Bangkok et Saigon, le jeudi via Bangkok, Saigon et Hong Kong et le dimanche via Bangkok et Hong Kong.","full":"Air France met ses Boeing 707 en service sur la ligne Paris-Tokyo par la route des Indes à raison de trois vols hebdomadaires : le mardi via Calcutta, Bangkok et Saigon, le jeudi via Bangkok, Saigon et Hong Kong et le dimanche via Bangkok et Hong Kong.","answer":"Boeing 707","aliases":["Boeing 707","707","B707"],"date":"1960-11-15","title":"Ouverture de la ligne Paris-Tokyo en Boeing 707","id":"texte-moyen-2"},{"mode":"texte","level":"moyen","prompt":"Quel avion ?","masked":"Air France confirme sa commande ferme de 25 ▒▒▒ avec une prise d’option sur 25 autres exemplaires et le choix du moteur, le CFM.56-5A1, fabriqué conjointement par la Snecma et General Electric.","full":"Air France confirme sa commande ferme de 25 Airbus A320 avec une prise d’option sur 25 autres exemplaires et le choix du moteur, le CFM.56-5A1, fabriqué conjointement par la Snecma et General Electric.","answer":"Airbus A320","aliases":["Airbus A320","A320"],"date":"1983-12-13","title":"Commande ferme de 25 Airbus A320","id":"texte-moyen-3"},{"mode":"texte","level":"moyen","prompt":"Quel aviateur ?","masked":"Pour la première fois au monde, un circuit fermé de un kilomètre est officiellement contrôlé et homologué. \nC'est ▒▒▒ sur Biplan Voisin qui réalise l'exploit. \nIl gagne ainsi le Grand Prix d'Aviation offert par Ernest Archdeacon et Henry Deutsch de la Meurthe.","full":"Pour la première fois au monde, un circuit fermé de un kilomètre est officiellement contrôlé et homologué. \nC'est Henri Farman sur Biplan Voisin qui réalise l'exploit. \nIl gagne ainsi le Grand Prix d'Aviation offert par Ernest Archdeacon et Henry Deutsch de la Meurthe.","answer":"Henri Farman","aliases":["Henri Farman","Farman"],"date":"1908-01-13","title":"Farman remporte le premier circuit fermé homologué","id":"texte-moyen-4"},{"mode":"texte","level":"moyen","prompt":"Quel aviateur ?","masked":"Parti le 14 Janvier de Los Angeles, ▒▒▒ a couvert les 3.953 km qui séparent cette ville de New-York en 9h 27 à bord d'un avion Northrop. Cette remarquable performance présente un intérêt technique de valeur pour les Européens.","full":"Parti le 14 Janvier de Los Angeles, Howard Hughes a couvert les 3.953 km qui séparent cette ville de New-York en 9h 27 à bord d'un avion Northrop. Cette remarquable performance présente un intérêt technique de valeur pour les Européens.","answer":"Howard Hughes","aliases":["Howard Hughes","Hughes"],"date":"1936-02-01","title":"Howard Hughes relie Los Angeles à New York en 9 h 27","id":"texte-moyen-5"},{"mode":"texte","level":"moyen","prompt":"Quel pilote ?","masked":"1 et 2, Inauguration de la ligne Toulouse-Rabat (Toulouse-Barcelone-Alicante-Malaga-Rabat par ▒▒▒, pilote, en Breguet XIV), pour le compte de la société des Lignes Aériennes Latécoère. Durée du trajet 32 heures, soit 55 km/h. Prix : Toulouse-Barcelone 390 F, Toulouse-Tanger 1100 F et Toulouse-Rabat 1300 F. Appareils : Breguet et Salmson.","full":"1 et 2, Inauguration de la ligne Toulouse-Rabat (Toulouse-Barcelone-Alicante-Malaga-Rabat par Didier Daurat, pilote, en Breguet XIV), pour le compte de la société des Lignes Aériennes Latécoère. Durée du trajet 32 heures, soit 55 km/h. Prix : Toulouse-Barcelone 390 F, Toulouse-Tanger 1100 F et Toulouse-Rabat 1300 F. Appareils : Breguet et Salmson.","answer":"Didier Daurat","aliases":["Didier Daurat","Daurat"],"date":"1919-09-01","title":"Inauguration de la ligne Toulouse-Rabat par Daurat","id":"texte-moyen-6"},{"mode":"texte","level":"moyen","prompt":"Qui aurait proposé le nom « Air France » ?","masked":"Au procès verbal de l'Assemblée générale des actionnaires de la SCELA, figure la phrase suivante : L'Assemblée générale décide d'ajouter un sous-titre à la dénomination sociale : «Air France».\nEn juillet, paraît une information dans «Air Magazine» dévoilant que la future compagnie s'appellera «Air France». C'est ▒▒▒ qui aurait proposé ce nom.","full":"Au procès verbal de l'Assemblée générale des actionnaires de la SCELA, figure la phrase suivante : L'Assemblée générale décide d'ajouter un sous-titre à la dénomination sociale : «Air France».\nEn juillet, paraît une information dans «Air Magazine» dévoilant que la future compagnie s'appellera «Air France». C'est Maurice Noguès qui aurait proposé ce nom.","answer":"Maurice Noguès","aliases":["Maurice Noguès","Noguès","Nogues"],"date":"1933-06-30","title":"L'assemblée de la SCELA ajoute « Air France »","id":"texte-moyen-7"},{"mode":"texte","level":"moyen","prompt":"Quel sommet ?","masked":"L’avion régulier d’Air France Saigon/Paris fait exceptionnellement escale à New-Delhi pour rapatrier en France une partie de l’expédition française de l’Himalaya.On sait que les alpinistes ont atteint pour la première fois un sommet de plus de 8000 mètres :’l’▒▒▒(8078m)","full":"L’avion régulier d’Air France Saigon/Paris fait exceptionnellement escale à New-Delhi pour rapatrier en France une partie de l’expédition française de l’Himalaya.On sait que les alpinistes ont atteint pour la première fois un sommet de plus de 8000 mètres :’l’Annapurna(8078m)","answer":"Annapurna","aliases":["Annapurna"],"date":"1950-07-17","title":"Rapatriement de l'expédition de l'Himalaya","id":"texte-moyen-8"},{"mode":"texte","level":"moyen","prompt":"Quel satellite ?","masked":"A 20h02, les réservations d’Air France de Paris et de New York entrent en contact téléphonique, en utilisant le satellite ▒▒▒ comme relais, pour réserver la place d’un passager.\nC’est la première liaison de cette nature réalisée dans le monde.","full":"A 20h02, les réservations d’Air France de Paris et de New York entrent en contact téléphonique, en utilisant le satellite Telstar comme relais, pour réserver la place d’un passager.\nC’est la première liaison de cette nature réalisée dans le monde.","answer":"Telstar","aliases":["Telstar"],"date":"1962-08-08","title":"Première réservation via le satellite Telstar","id":"texte-moyen-9"},{"mode":"texte","level":"moyen","prompt":"Quelle ville ?","masked":"Ouverture de la ligne Paris-▒▒▒ en Concorde par Air France. 7.167 km en 6h avec escale aux Açores. Il faut 11h35 min en avion subsonique.","full":"Ouverture de la ligne Paris-Caracas en Concorde par Air France. 7.167 km en 6h avec escale aux Açores. Il faut 11h35 min en avion subsonique.","answer":"Caracas","aliases":["Caracas"],"date":"1976-04-09","title":"Inauguration de la ligne Concorde Paris-Caracas","id":"texte-moyen-10"},{"mode":"texte","level":"moyen","prompt":"Quelle ville ?","masked":"Ouverture de Paris-▒▒▒ en Concorde d’Air France à raison de deux vols par semaine, en prolongement de deux vols Paris-Washington. La durée du voyage est de 4 h 40 mn, y compris un temps d’escale de 50 mn à Washington. Ce temps de voyage est à comparer à 13 h 30 mn, durée du vol subsonique le plus rapide dans le sens Paris-▒▒▒, et à 12 h 20 mn, durée du vol subsonique dans le sens ▒▒▒-Paris.","full":"Ouverture de Paris-Mexico en Concorde d’Air France à raison de deux vols par semaine, en prolongement de deux vols Paris-Washington. La durée du voyage est de 4 h 40 mn, y compris un temps d’escale de 50 mn à Washington. Ce temps de voyage est à comparer à 13 h 30 mn, durée du vol subsonique le plus rapide dans le sens Paris-Mexico, et à 12 h 20 mn, durée du vol subsonique dans le sens Mexico-Paris.","answer":"Mexico","aliases":["Mexico","Mexico City"],"date":"1978-09-20","title":"Ouverture de la ligne Paris-Mexico en Concorde","id":"texte-moyen-11"},{"mode":"texte","level":"moyen","prompt":"Quel territoire ?","masked":"Air France reprend la desserte de la ▒▒▒ qu’elle a mise en service 41 ans plus tôt. Une seule escale technique à Tokyo ; durée du vol ramenée à 21h 30.","full":"Air France reprend la desserte de la Nouvelle-Calédonie qu’elle a mise en service 41 ans plus tôt. Une seule escale technique à Tokyo ; durée du vol ramenée à 21h 30.","answer":"Nouvelle-Calédonie","aliases":["Nouvelle-Calédonie","Nouméa","Calédonie"],"date":"1990-01-01","title":"Reprise de la desserte de Nouvelle-Calédonie","id":"texte-moyen-12"},{"mode":"texte","level":"difficile","prompt":"Quel hydravion ?","masked":"22 et 23 juin, record international de distance par l'hydravion quadrimoteur ▒▒▒ \"▒▒▒\" d'Air France. Equipage : Lieutenant de vaisseau Hébrard, chef de bord ; Lieutenant de vaisseau d'Aillières navigateur ; Rouchon et Casellari pilotes ; Emont, radio ; Lavidalie, mécanicien, sur le trajet Cherbourg-Ziguinchor (Sénégal).","full":"22 et 23 juin, record international de distance par l'hydravion quadrimoteur Latécoère 300 \"Croix du Sud\" d'Air France. Equipage : Lieutenant de vaisseau Hébrard, chef de bord ; Lieutenant de vaisseau d'Aillières navigateur ; Rouchon et Casellari pilotes ; Emont, radio ; Lavidalie, mécanicien, sur le trajet Cherbourg-Ziguinchor (Sénégal).","answer":"Latécoère 300","aliases":["Latécoère 300","Croix du Sud","Laté 300","Latécoère"],"date":"1935-06-22","title":"Record de distance du Latécoère 300 Croix-du-Sud","id":"texte-difficile-1"},{"mode":"texte","level":"difficile","prompt":"Quel avion ?","masked":"1er vol à Etampes du ▒▒▒ «▒▒▒». Le 16.01.33 inaugure la série des traversées régulières postales de l'Atlantique Sud avec Mermoz, Carretier, Mailloux, Manuel et Jousse ; il effectua 8 traversées. Il devient Nº71 après modif du fuselage et dérive latèrale. Mis aux enchères, il est racheté par ▒▒▒ en mai 37 pour 12 000FR.\nDétruit par les allemands","full":"1er vol à Etampes du Couzinet 70 «Arc en Ciel». Le 16.01.33 inaugure la série des traversées régulières postales de l'Atlantique Sud avec Mermoz, Carretier, Mailloux, Manuel et Jousse ; il effectua 8 traversées. Il devient Nº71 après modif du fuselage et dérive latèrale. Mis aux enchères, il est racheté par Couzinet en mai 37 pour 12 000FR.\nDétruit par les allemands","answer":"Arc en Ciel","aliases":["Arc en Ciel","Couzinet 70","Couzinet"],"date":"1932-02-11","title":"Premier vol du Couzinet 70 « Arc en Ciel »","id":"texte-difficile-2"},{"mode":"texte","level":"difficile","prompt":"Quel trimoteur ?","masked":"Le trimoteur d'Air France ▒▒▒ \"▒▒▒\" F-AMMY, quitte Le Bourget. Il va relier Saigon en 48 heures au lieu des 79 heures jusque-là nécessaires. Maurice Noguès est à bord. L'appareil est piloté par Launay avec Crampel comme mécanicien.","full":"Le trimoteur d'Air France Dewoitine 332 \"Emeraude\" F-AMMY, quitte Le Bourget. Il va relier Saigon en 48 heures au lieu des 79 heures jusque-là nécessaires. Maurice Noguès est à bord. L'appareil est piloté par Launay avec Crampel comme mécanicien.","answer":"Dewoitine 332","aliases":["Dewoitine 332","Emeraude","Dewoitine"],"date":"1933-12-21","title":"Dewoitine 332 « Émeraude » relie Paris–Saïgon en 48 heures","id":"texte-difficile-3"},{"mode":"texte","level":"difficile","prompt":"Quel avion ?","masked":"Les pilotes Coupet et Drouhin, sur ▒▒▒, battent le record d'endurance sans ravitaillement en vol avec 37 h 59 min et 10s.","full":"Les pilotes Coupet et Drouhin, sur Farman F.60, battent le record d'endurance sans ravitaillement en vol avec 37 h 59 min et 10s.","answer":"Farman F.60","aliases":["Farman F.60","Goliath","Farman F60","F.60"],"date":"1924-07-16","title":"Record d'endurance de 38 heures sur Farman F.60","id":"texte-difficile-4"},{"mode":"texte","level":"difficile","prompt":"Quel avion ?","masked":"Franco Roumaine : Maurice Noguès réalise le trajet Paris-Strasbourg en 139 minutes pour le concours du \"Journal\", avec le ▒▒▒ F-AEHN.","full":"Franco Roumaine : Maurice Noguès réalise le trajet Paris-Strasbourg en 139 minutes pour le concours du \"Journal\", avec le Spad 46 F-AEHN.","answer":"Spad 46","aliases":["Spad 46","Spad"],"date":"1923-05-10","title":"Noguès relie Paris-Strasbourg en 139 minutes","id":"texte-difficile-5"},{"mode":"texte","level":"difficile","prompt":"Quel avion ?","masked":"Premier service Casablanca-Dakar, par la C.G.E.A., avec transport de courrier, sur deux ▒▒▒ pilotés par Lécrivain et Lassalle. Par cette nouvelle ligne, les lettres et colis expédiés de Marseille et Toulon le dimanche matin parviennent à Dakar le mardi soir à 14h00, alors que 10 jours sont nécessaires par bateau.","full":"Premier service Casablanca-Dakar, par la C.G.E.A., avec transport de courrier, sur deux Breguet XIV pilotés par Lécrivain et Lassalle. Par cette nouvelle ligne, les lettres et colis expédiés de Marseille et Toulon le dimanche matin parviennent à Dakar le mardi soir à 14h00, alors que 10 jours sont nécessaires par bateau.","answer":"Breguet XIV","aliases":["Breguet XIV","Breguet 14","Bréguet XIV"],"date":"1925-06-01","title":"Premier service postal Casablanca-Dakar par la CGEA","id":"texte-difficile-6"},{"mode":"texte","level":"difficile","prompt":"Quel avion ?","masked":"Air France reçoit le premier des sept ▒▒▒-200 qu’elle exploitera. Elle le met en ligne le 12.05.84 sur Paris-Milan.","full":"Air France reçoit le premier des sept Airbus A310-200 qu’elle exploitera. Elle le met en ligne le 12.05.84 sur Paris-Milan.","answer":"Airbus A310","aliases":["Airbus A310","A310"],"date":"1984-04-27","title":"Réception du premier Airbus A310","id":"texte-difficile-7"},{"mode":"texte","level":"difficile","prompt":"Quel chef pilote ?","masked":"▒▒▒, chef pilote d'Air France se tue, à Gournay en Brie, lors d'un vol inaugural de liaison postale Paris-Londres. Perdu dans la brume, il heurte un arbre et s'écrase. Il avait 38 ans.","full":"Robert Bajac, chef pilote d'Air France se tue, à Gournay en Brie, lors d'un vol inaugural de liaison postale Paris-Londres. Perdu dans la brume, il heurte un arbre et s'écrase. Il avait 38 ans.","answer":"Robert Bajac","aliases":["Robert Bajac","Bajac"],"date":"1935-04-01","title":"Mort du chef pilote Robert Bajac à Gournay-en-Brie","id":"texte-difficile-8"}];
+const $ = id => document.getElementById(id);
+const MODES = {
+  carte:  { label: "Carte",       T: 40 }, annee: { label: "Frise",       T: 45 },
+  nombre: { label: "Estimation",  T: 50 }, ordre: { label: "Chronologie", T: 60 },
+  texte:  { label: "Devinette",   T: 60 },
+};
+const LEVELS = {
+  facile:    { label: "Facile",    text: "Villes et événements célèbres, tolérance large." },
+  moyen:     { label: "Moyen",     text: "Histoire de la compagnie : il faut avoir de bonnes notions." },
+  difficile: { label: "Difficile", text: "Archives pointues, tolérance serrée." },
+};
+const SCALE = {
+  carte:  { facile: 2500, moyen: 1500, difficile: 800 },    // km : 37 % des points à cette distance
+  annee:  { facile: 12, moyen: 8, difficile: 5 },           // années
+  nombre: { facile: 0.6, moyen: 0.4, difficile: 0.45 },     // écart logarithmique
+};
+const MAXPTS = 5000, SEEN_KEY = "musee-af-quiz-vus", BOARD_KEY = "musee-af-quiz-classement", NAME_KEY = "musee-af-quiz-pseudo";
+
+// --- stockage (localStorage, avec repli mémoire si indisponible) ---
+const mem = {};
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v === null ? (k in mem ? mem[k] : d) : JSON.parse(v); } catch (e) { return k in mem ? mem[k] : d; } },
+  set(k, v) { mem[k] = v; try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+};
+
+// --- état ---
+const S = { level: "facile", qs: [], i: 0, total: 0, results: [], cur: null, t0: 0, raf: 0, lastEntry: null };
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const fmt = n => Math.round(n).toLocaleString("fr-FR");
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const dateFr = iso => new Date(iso + "T12:00:00").toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+const fold = s => s.toLowerCase().replace(/[’]/g, "'").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+
+// --- écran de départ ---
+function bestOf(level) {
+  const scores = store.get(BOARD_KEY, []).filter(e => e.level === level).map(e => e.score);
+  return scores.length ? Math.max(...scores) : null;
+}
+function renderLevels() {
+  $("levels").innerHTML = Object.entries(LEVELS).map(([k, v]) => {
+    const best = bestOf(k);
+    return `<button class="lvl ${k === S.level ? "on" : ""}" data-l="${k}"><b>${v.label}</b><span>${v.text}</span><span>${best === null ? "Pas encore joué" : "Meilleur score : " + fmt(best)}</span></button>`;
+  }).join("");
+  document.querySelectorAll(".lvl").forEach(b => b.onclick = () => { S.level = b.dataset.l; renderLevels(); boardTab = S.level; renderBoard(); });
+}
+$("pseudo").value = store.get(NAME_KEY, "");
+
+function pickQuestions(level) {
+  const seen = new Set(store.get(SEEN_KEY, []));
+  const picked = shuffle(Object.keys(MODES)).map(mode => {
+    const pool = Q.filter(q => q.mode === mode && q.level === level);
+    let fresh = pool.filter(q => !seen.has(q.id));
+    if (!fresh.length) { pool.forEach(q => seen.delete(q.id)); fresh = pool; }
+    const q = fresh[Math.floor(Math.random() * fresh.length)];
+    seen.add(q.id);
+    return q;
+  });
+  store.set(SEEN_KEY, [...seen]);
+  return picked;
+}
+
+function startGame() {
+  store.set(NAME_KEY, $("pseudo").value.trim());
+  Object.assign(S, { qs: pickQuestions(S.level), i: 0, total: 0, results: [], lastEntry: null });
+  $("start").classList.add("hidden"); $("end").classList.add("hidden"); $("game").classList.remove("hidden");
+  $("score").textContent = "0";
+  showQuestion();
+}
+$("play").onclick = startGame;
+$("again").onclick = startGame;
+$("menu").onclick = () => { $("end").classList.add("hidden"); $("start").classList.remove("hidden"); renderLevels(); };
+
+// --- minuteur et points ---
+const mult = el => 1 - 0.5 * Math.min(1, el / S.cur.T);
+function tick() {
+  const el = (performance.now() - S.t0) / 1000, left = Math.max(0, 1 - el / S.cur.T);
+  $("tbar").style.width = (left * 100) + "%";
+  $("tbar").classList.toggle("low", left < 0.25);
+  $("pot").textContent = `Jusqu'à ${fmt(MAXPTS * mult(el))} points si tu réponds maintenant · ${Math.ceil(S.cur.T - el)} s`;
+  if (el >= S.cur.T) { S.cur.timeUp(); return; }
+  S.raf = requestAnimationFrame(tick);
+}
+function finish(acc, view) {
+  cancelAnimationFrame(S.raf);
+  const el = Math.min((performance.now() - S.t0) / 1000, S.cur.T), m = mult(el);
+  const pts = acc > 0 ? Math.round(MAXPTS * Math.min(1, acc) * m) : 0;
+  S.total += pts;
+  S.results.push({ mode: S.cur.q.mode, pts, acc, secs: el });
+  $("score").textContent = fmt(S.total);
+  $("tbar").style.width = "0%"; $("pot").textContent = "";
+  $("r-pts").textContent = `+${fmt(pts)} points`;
+  $("r-det").textContent = `Précision ${Math.round(Math.min(1, acc) * 100)} % × rapidité ×${m.toFixed(2)} (${el.toFixed(1)} s)`;
+  $("r-ans").innerHTML = view.answer;
+  const q = S.cur.q;
+  $("r-src").textContent = view.src || (q.title ? `Éphéméride du ${dateFr(q.date)} : ${q.title}` : "");
+  $("r-src").classList.toggle("hidden", !$("r-src").textContent);
+  $("next").textContent = S.i === 4 ? "Voir le résultat" : "Question suivante";
+  $("reveal").classList.remove("hidden");
+  $("next").focus({ preventScroll: true });
+  S.cur.locked = true;
+}
+$("next").onclick = () => { S.i++; S.i >= 5 ? endGame() : showQuestion(); };
+
+function showQuestion() {
+  const q = S.qs[S.i];
+  document.querySelectorAll(".panel").forEach(p => p.classList.add("hidden"));
+  $("reveal").classList.add("hidden");
+  $("qn").textContent = S.i + 1;
+  $("qmode").textContent = MODES[q.mode].label;
+  $("qlevel").textContent = LEVELS[q.level].label;
+  $("p-" + q.mode).classList.remove("hidden");
+  S.cur = { q, T: MODES[q.mode].T, locked: false };
+  SETUP[q.mode](q);
+  S.t0 = performance.now();
+  S.raf = requestAnimationFrame(tick);
+  $("game").scrollIntoView({ block: "nearest" });
+}
+
+// --- mode carte ---
+const MW = 1000, MH = 520;
+const svg = d3.select("#map").attr("viewBox", `0 0 ${MW} ${MH}`);
+const proj = d3.geoEqualEarth().fitExtent([[6, 6], [MW - 6, MH - 6]], { type: "Sphere" });
+const gpath = d3.geoPath(proj);
+const root = svg.append("g");
+root.append("path").attr("class", "sphere").attr("d", gpath({ type: "Sphere" }));
+root.append("path").attr("class", "grat").attr("d", gpath(d3.geoGraticule10()));
+const gLand = root.append("g"), gMarks = root.append("g");
+const zoom = d3.zoom().scaleExtent([1, 14]).translateExtent([[0, 0], [MW, MH]]).on("zoom", e => {
+  root.attr("transform", e.transform);
+  gMarks.selectAll("circle").attr("r", function () { return this.dataset.r / e.transform.k; }).attr("stroke-width", 1.5 / e.transform.k);
+});
+svg.call(zoom).on("dblclick.zoom", null);
+$("zin").onclick = () => svg.transition().duration(250).call(zoom.scaleBy, 1.8);
+$("zout").onclick = () => svg.transition().duration(250).call(zoom.scaleBy, 1 / 1.8);
+$("zreset").onclick = () => svg.transition().duration(300).call(zoom.transform, d3.zoomIdentity);
+fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json").then(r => r.json()).then(topo => {
+  const [kx, ky] = topo.transform.scale, [tx, ty] = topo.transform.translate;
+  const decoded = topo.arcs.map(a => { let x = 0, y = 0; return a.map(([dx, dy]) => [(x += dx) * kx + tx, (y += dy) * ky + ty]); });
+  const ring = idx => idx.flatMap(i => i >= 0 ? decoded[i] : decoded[~i].slice().reverse());
+  const polys = [];
+  for (const g of topo.objects.countries.geometries) {
+    if (g.type === "Polygon") polys.push(g.arcs.map(ring));
+    else if (g.type === "MultiPolygon") g.arcs.forEach(p => polys.push(p.map(ring)));
+  }
+  gLand.append("path").attr("class", "land").attr("d", gpath({ type: "MultiPolygon", coordinates: polys }));
+}).catch(() => { $("c-help").textContent = "Fond de carte indisponible (hors ligne) : seules les graticules sont tracées, le jeu reste jouable."; });
+
+const km = (a, b) => d3.geoDistance(a, b) * 6371;
+function mark(ll, cls, r) {
+  const [x, y] = proj(ll);
+  return gMarks.append("circle").attr("class", cls).attr("cx", x).attr("cy", y).attr("data-r", r).attr("r", r).attr("stroke-width", 1.5);
+}
+function fitTo(lls) {
+  const pts = lls.map(proj), xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+  const dx = Math.max(...xs) - Math.min(...xs), dy = Math.max(...ys) - Math.min(...ys);
+  const k = Math.max(1, Math.min(8, 0.6 * Math.min(MW / Math.max(dx, 1), MH / Math.max(dy, 1))));
+  const cx = (Math.max(...xs) + Math.min(...xs)) / 2, cy = (Math.max(...ys) + Math.min(...ys)) / 2;
+  svg.transition().duration(800).call(zoom.transform, d3.zoomIdentity.translate(MW / 2 - k * cx, MH / 2 - k * cy).scale(k));
+}
+function setupCarte(q) {
+  gMarks.selectAll("*").remove();
+  svg.interrupt().call(zoom.transform, d3.zoomIdentity);
+  $("c-name").textContent = q.label; $("c-country").textContent = `(${q.country})`;
+  const st = S.cur; st.guess = null; $("c-ok").disabled = true;
+  const submit = () => {
+    if (st.locked) return;
+    if (!st.guess) { finish(0, { answer: `Tu n'as pas placé de repère. <span class="good">${esc(q.label)}</span> était ici.` }); revealTarget(null); return; }
+    const d = km(st.guess, [q.lon, q.lat]), acc = d < 25 ? 1 : Math.exp(-d / SCALE.carte[q.level]);
+    revealTarget(st.guess);
+    finish(acc, { answer: `Tu étais à <span class="good">${fmt(d)} km</span> de ${esc(q.label)}.`, src: q.fact ? `Dans les éphémérides (${dateFr(q.fact[0])}) : ${q.fact[1]}` : "" });
+  };
+  const revealTarget = g => { mark([q.lon, q.lat], "truth", 8); if (g) { gMarks.insert("path", ":first-child").attr("class", "link").attr("d", gpath({ type: "LineString", coordinates: [g, [q.lon, q.lat]] })); fitTo([g, [q.lon, q.lat]]); } else fitTo([[q.lon, q.lat]]); };
+  svg.on("click", e => {
+    if (st.locked) return;
+    const [x, y] = d3.pointer(e, root.node()), ll = proj.invert([x, y]);
+    if (!ll || isNaN(ll[0]) || Math.hypot(proj(ll)[0] - x, proj(ll)[1] - y) > 1.5) return;  // en dehors du globe
+    gMarks.selectAll(".pin").remove();
+    const k = d3.zoomTransform(svg.node()).k;
+    mark(ll, "pin", 7).attr("r", 7 / k);
+    st.guess = ll; $("c-ok").disabled = false;
+  });
+  $("c-ok").onclick = submit;
+  st.timeUp = submit;
+}
+
+// --- mode année ---
+function setupAnnee(q) {
+  const sl = $("y-sl"), st = S.cur;
+  $("y-text").textContent = q.text;
+  sl.value = 1960; $("y-val").textContent = sl.value;
+  sl.oninput = () => $("y-val").textContent = sl.value;
+  const submit = () => {
+    if (st.locked) return;
+    const guess = +sl.value, gap = Math.abs(guess - q.year), acc = gap === 0 ? 1 : Math.exp(-gap / SCALE.annee[q.level]);
+    const span = 2022 - 1905, pos = y => ((y - 1905) / span * 100).toFixed(1);
+    sl.disabled = true;
+    finish(acc, { answer: `C'était en <span class="good">${q.year}</span>${gap ? ` : tu as proposé ${guess}, soit ${gap} an${gap > 1 ? "s" : ""} d'écart` : " : en plein dans le mille !"}.
+      <div style="position:relative;height:34px;margin:10px 0 0"><div style="position:absolute;left:0;right:0;top:16px;height:2px;background:var(--line)"></div>
+      <div title="Ta réponse" style="position:absolute;left:${pos(guess)}%;top:6px;width:12px;height:22px;margin-left:-6px;border-radius:3px;background:var(--accent)"></div>
+      <div title="Réponse" style="position:absolute;left:${pos(q.year)}%;top:6px;width:12px;height:22px;margin-left:-6px;border-radius:3px;background:var(--accent2)"></div></div>` });
+  };
+  sl.disabled = false;
+  $("y-ok").onclick = submit;
+  st.timeUp = submit;
+}
+
+// --- mode nombre ---
+function parseNumber(raw) {
+  let s = raw.trim().replace(/[\s  ]/g, "");
+  if (/^\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, "");   // 1.075.000
+  s = s.replace(",", ".");
+  return /^\d+(\.\d+)?$/.test(s) ? parseFloat(s) : NaN;
+}
+function setupNombre(q) {
+  const inp = $("n-in"), st = S.cur;
+  $("n-prompt").textContent = q.prompt; $("n-unit").textContent = q.unit; $("n-msg").textContent = "";
+  inp.value = ""; inp.disabled = false; inp.focus();
+  const submit = force => {
+    if (st.locked) return;
+    const v = parseNumber(inp.value);
+    if (isNaN(v) || v <= 0) {
+      if (!force) { $("n-msg").textContent = "Entre un nombre strictement positif (ex. 1 075 000 ou 11,5)."; inp.classList.remove("shake"); void inp.offsetWidth; inp.classList.add("shake"); return; }
+      finish(0, { answer: `Pas de réponse. La valeur était <span class="good">${fmt(q.answer)} ${esc(q.unit)}</span>.`, src: q.source }); return;
+    }
+    const off = Math.abs(Math.log(v / q.answer)), acc = off < 0.01 ? 1 : Math.exp(-off / SCALE.nombre[q.level]);
+    inp.disabled = true;
+    finish(acc, { answer: `Réponse : <span class="good">${fmt(q.answer)} ${esc(q.unit)}</span> · tu as dit ${fmt(v)} (${v > q.answer ? "+" : "−"}${Math.round(Math.abs(v - q.answer) / q.answer * 100)} %).`,
+      src: `Éphéméride du ${dateFr(q.date)} : ${q.source}` });
+  };
+  $("n-ok").onclick = () => submit(false);
+  inp.onkeydown = e => { if (e.key === "Enter") submit(false); };
+  st.timeUp = () => submit(true);
+}
+
+// --- mode ordre ---
+function setupOrdre(q) {
+  const st = S.cur, items = shuffle(q.items.map((it, i) => ({ ...it, rank: i })));   // rank = vrai rang
+  st.picked = [];
+  const box = $("o-cards");
+  const draw = () => {
+    box.innerHTML = items.map((it, i) => `<button class="ocard ${st.picked.includes(i) ? "picked" : ""}" data-i="${i}"><span class="n">${st.picked.includes(i) ? st.picked.indexOf(i) + 1 : ""}</span>${esc(it.title)}</button>`).join("");
+    box.querySelectorAll(".ocard").forEach(b => b.onclick = () => {
+      if (st.locked) return;
+      const i = +b.dataset.i, at = st.picked.indexOf(i);
+      if (at >= 0) st.picked.splice(at, 1); else st.picked.push(i);
+      draw();
+    });
+    $("o-ok").disabled = st.picked.length < 4;
+  };
+  const submit = () => {
+    if (st.locked) return;
+    const ranks = st.picked.map(i => items[i].rank);
+    let good = 0;
+    for (let a = 0; a < ranks.length; a++) for (let b = a + 1; b < ranks.length; b++) if (ranks[a] < ranks[b]) good++;
+    const acc = Math.pow(good / 6, 2);
+    box.innerHTML = q.items.map((it, r) => {
+      const idx = items.findIndex(x => x.rank === r), mine = st.picked.indexOf(idx);
+      return `<div class="ocard ${mine === r ? "ok" : "ko"}"><span class="n">${r + 1}</span>${esc(it.title)}<small>${it.year}${mine < 0 ? " · non classé" : mine === r ? " · bien placé" : ` · tu l'avais mis ${mine + 1}ᵉ`}</small></div>`;
+    }).join("");
+    $("o-ok").disabled = true;
+    finish(acc, { answer: `<span class="good">${good} paire${good > 1 ? "s" : ""} sur 6</span> dans le bon ordre.`, src: "Dates tirées des éphémérides correspondantes." });
+  };
+  $("o-reset").onclick = () => { if (!st.locked) { st.picked = []; draw(); } };
+  $("o-ok").onclick = submit;
+  st.timeUp = submit;
+  draw();
+}
+
+// --- mode texte ---
+function lev(a, b) {
+  const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
+  for (let j = 1; j <= b.length; j++) d[0][j] = j;
+  for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++)
+    d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+  return d[a.length][b.length];
+}
+function matches(guess, aliases) {
+  const g = fold(guess);
+  if (!g) return false;
+  return aliases.some(al => {
+    const a = fold(al);
+    if (g === a || (" " + g + " ").includes(" " + a + " ")) return true;
+    const tol = a.length >= 9 ? 2 : a.length >= 5 ? 1 : 0;
+    return tol > 0 && lev(g, a) <= tol;
+  });
+}
+function setupTexte(q) {
+  const inp = $("t-in"), st = S.cur;
+  st.wrong = 0; st.hint = false;
+  $("t-prompt").textContent = q.prompt; $("t-text").textContent = q.masked; $("t-msg").textContent = "";
+  inp.value = ""; inp.disabled = false; inp.focus();
+  $("t-hint").disabled = false;
+  const end = (ok, forced) => {
+    inp.disabled = true; $("t-hint").disabled = true;
+    const acc = ok ? Math.max(0.2, 1 - 0.15 * st.wrong - (st.hint ? 0.25 : 0)) : 0;
+    finish(acc, { answer: ok ? `Bravo : <span class="good">${esc(q.answer)}</span>${st.wrong ? ` (${st.wrong} essai${st.wrong > 1 ? "s" : ""} raté${st.wrong > 1 ? "s" : ""})` : ""}.`
+      : `${forced ? "Temps écoulé" : "Dommage"} : c'était <span class="good">${esc(q.answer)}</span>.`, src: `Éphéméride du ${dateFr(q.date)} :\n${q.full}` });
+  };
+  const submit = () => {
+    if (st.locked) return;
+    if (matches(inp.value, q.aliases)) return end(true);
+    if (!inp.value.trim()) return;
+    st.wrong++;
+    $("t-msg").textContent = `Non, ce n'est pas « ${inp.value.trim()} » (−15 % des points possibles). Réessaie.`;
+    inp.value = ""; inp.classList.remove("shake"); void inp.offsetWidth; inp.classList.add("shake");
+  };
+  $("t-ok").onclick = submit;
+  inp.onkeydown = e => { if (e.key === "Enter") submit(); };
+  $("t-hint").onclick = () => {
+    if (st.locked || st.hint) return;
+    st.hint = true; $("t-hint").disabled = true;
+    const a = q.answer.replace(/[^\p{L}\p{N}]/gu, "");
+    $("t-msg").textContent = `Indice : ${a.length} caractères, ça commence par « ${q.answer[0]} ».`;
+  };
+  $("t-skip").onclick = () => { if (!st.locked) end(false, false); };
+  st.timeUp = () => end(false, true);
+}
+const SETUP = { carte: setupCarte, annee: setupAnnee, nombre: setupNombre, ordre: setupOrdre, texte: setupTexte };
+
+// --- fin de partie et classement ---
+let boardTab = "tous";
+function endGame() {
+  $("game").classList.add("hidden"); $("end").classList.remove("hidden");
+  const name = store.get(NAME_KEY, "") || "Anonyme";
+  const entry = { name, level: S.level, score: S.total, date: new Date().toISOString(), id: Math.random().toString(36).slice(2) };
+  const board = store.get(BOARD_KEY, []); board.push(entry); store.set(BOARD_KEY, board);
+  S.lastEntry = entry.id;
+  const same = board.filter(e => e.level === S.level).sort((a, b) => b.score - a.score);
+  $("e-level").textContent = LEVELS[S.level].label;
+  $("e-score").textContent = fmt(S.total);
+  $("e-rank").textContent = `${name} : n° ${same.findIndex(e => e.id === entry.id) + 1} sur ${same.length} au classement ${LEVELS[S.level].label.toLowerCase()}.`;
+  $("e-table").innerHTML = "<tr><th>Mode</th><th class='n'>Temps</th><th class='n'>Précision</th><th class='n'>Points</th></tr>" +
+    S.results.map(r => `<tr><td>${MODES[r.mode].label}</td><td class="n">${r.secs.toFixed(1)} s</td><td class="n">${Math.round(Math.min(1, r.acc) * 100)} %</td><td class="n">${fmt(r.pts)}</td></tr>`).join("");
+  boardTab = S.level; renderBoard();
+}
+function renderBoard() {
+  const tabs = [["tous", "Tous niveaux"], ...Object.entries(LEVELS).map(([k, v]) => [k, v.label])];
+  $("tabs").innerHTML = tabs.map(([k, l]) => `<button class="${k === boardTab ? "on" : ""}" data-k="${k}">${l}</button>`).join("");
+  $("tabs").querySelectorAll("button").forEach(b => b.onclick = () => { boardTab = b.dataset.k; renderBoard(); });
+  const rows = store.get(BOARD_KEY, []).filter(e => boardTab === "tous" || e.level === boardTab).sort((a, b) => b.score - a.score || a.date.localeCompare(b.date)).slice(0, 10);
+  $("board").innerHTML = rows.length
+    ? "<tr><th class='n'>#</th><th>Joueur</th><th>Niveau</th><th>Date</th><th class='n'>Score</th></tr>" +
+      rows.map((e, i) => `<tr class="${e.id === S.lastEntry ? "me" : ""}"><td class="n">${i + 1}</td><td>${esc(e.name)}</td><td>${LEVELS[e.level].label}</td><td>${new Date(e.date).toLocaleDateString("fr-FR")}</td><td class="n">${fmt(e.score)}</td></tr>`).join("")
+    : "<tr><td class='muted'>Aucune partie pour l'instant : à toi de jouer !</td></tr>";
+}
+$("export").onclick = () => {
+  const url = URL.createObjectURL(new Blob([JSON.stringify(store.get(BOARD_KEY, []), null, 1)], { type: "application/json" }));
+  Object.assign(document.createElement("a"), { href: url, download: "classement-quiz-air-france.json" }).click();
+  URL.revokeObjectURL(url);
+};
+$("import").onclick = () => $("file").click();
+$("file").onchange = async () => {
+  try {
+    const incoming = JSON.parse(await $("file").files[0].text());
+    const board = store.get(BOARD_KEY, []), ids = new Set(board.map(e => e.id));
+    for (const e of incoming) if (e && e.id && !ids.has(e.id) && LEVELS[e.level] && Number.isFinite(e.score) && e.name) board.push({ id: String(e.id), name: String(e.name).slice(0, 20), level: e.level, score: e.score, date: String(e.date) });
+    store.set(BOARD_KEY, board); renderBoard(); renderLevels();
+  } catch (err) { alert("Fichier de classement illisible."); }
+  $("file").value = "";
+};
+$("clear").onclick = () => { if (confirm("Effacer tout le classement de ce navigateur ?")) { store.set(BOARD_KEY, []); renderBoard(); renderLevels(); } };
+
+renderLevels(); renderBoard();
+</script><script>
+(() => {
+  const M = {"slug": "quiz", "prev": "barometre-crises.html", "next": "devine-annee.html", "all": ["carte-reseau", "monde-retrecit", "villes-renommees", "prix-billets", "frise-avions", "vie-avion", "chiffres", "ce-jour-la", "personnages-lieux", "graphe-personnes", "genealogie", "greves-records", "barometre-crises", "quiz", "devine-annee", "demande-musee"]}, KEY = "musee-af-visites";
+  let seen = [];
+  try { seen = JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) {}
+  if (M.slug && !seen.includes(M.slug)) { seen.push(M.slug); try { localStorage.setItem(KEY, JSON.stringify(seen)); } catch (e) {} }
+  const done = M.all.filter(s => seen.includes(s));
+  document.querySelectorAll("[data-mu-visits]").forEach(el => el.textContent = `${done.length}/${M.all.length}`);
+  document.querySelectorAll(".mu-plan .mu-room").forEach(a => a.classList.toggle("seen", seen.includes(a.dataset.slug)));
+  document.querySelectorAll(".mu-legend a").forEach(a => a.classList.toggle("mu-done", seen.includes(a.dataset.slug)));
+  window.__museeVisites = seen;
+
+  const dr = document.getElementById("mu-drawer"), btn = document.getElementById("mu-plan-btn");
+  const open = v => { if (!dr) return; dr.hidden = !v; btn.setAttribute("aria-expanded", String(v)); if (v) dr.querySelector(".mu-close").focus(); else btn.focus(); };
+  if (dr) {
+    btn.onclick = () => open(dr.hidden);
+    document.querySelectorAll("[data-mu-plan]").forEach(b => b.onclick = () => open(true));
+    dr.addEventListener("click", e => { if (e.target === dr || e.target.closest(".mu-close")) open(false); });
+  }
+  addEventListener("keydown", e => {
+    if (dr && e.key === "Escape" && !dr.hidden) { open(false); return; }
+    if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+    const t = e.target;
+    if (t.closest && t.closest("input, textarea, select, [contenteditable], [role=slider]")) return;
+    if (e.key === "ArrowLeft" && M.prev) location.href = M.prev;
+    if (e.key === "ArrowRight" && M.next) location.href = M.next;
+    if (dr && (e.key === "p" || e.key === "P")) open(dr.hidden);
+  });
+})();
+</script></body></html>

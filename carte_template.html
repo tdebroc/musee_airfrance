@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Le réseau Air France dans le temps</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+<style>
+.viz-root {
+  color-scheme: light;
+  --page: #f9f9f7;
+  --surface-1: #fcfcfb;
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --text-muted: #898781;
+  --grid: #e1e0d9;
+  --baseline: #c3c2b7;
+  --land: #f0efec;
+  --border: rgba(11,11,11,0.10);
+  --series-1: #2a78d6;   /* lignes ouvertes les années précédentes */
+  --series-2: #eb6834;   /* lignes ouvertes l'année affichée */
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) .viz-root {
+    color-scheme: dark;
+    --page: #0d0d0d;
+    --surface-1: #1a1a19;
+    --text-primary: #f0efec;
+    --text-secondary: #c3c2b7;
+    --grid: #2c2c2a;
+    --baseline: #383835;
+    --land: #262624;
+    --border: rgba(255,255,255,0.10);
+    --series-1: #3987e5;
+    --series-2: #d95926;
+  }
+}
+:root[data-theme="dark"] .viz-root {
+  color-scheme: dark;
+  --page: #0d0d0d;
+  --surface-1: #1a1a19;
+  --text-primary: #f0efec;
+  --text-secondary: #c3c2b7;
+  --grid: #2c2c2a;
+  --baseline: #383835;
+  --land: #262624;
+  --border: rgba(255,255,255,0.10);
+  --series-1: #3987e5;
+  --series-2: #d95926;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+.viz-root {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--page);
+  color: var(--text-primary);
+  min-height: 100vh;
+  padding: 24px 32px 32px;
+}
+header h1 { font-size: 22px; font-weight: 600; margin: 0 0 4px; }
+header p { margin: 0; color: var(--text-secondary); font-size: 14px; }
+.sample-note {
+  display: inline-block; margin-top: 10px; padding: 4px 10px; border-radius: 6px;
+  border: 1px solid var(--border); color: var(--text-secondary); font-size: 12px;
+}
+.controls {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  margin: 20px 0 12px;
+}
+button {
+  font: inherit; font-size: 14px; color: var(--text-primary);
+  background: var(--surface-1); border: 1px solid var(--border);
+  border-radius: 8px; padding: 6px 14px; cursor: pointer;
+}
+button:hover { background: var(--land); }
+button[aria-pressed="true"] { border-color: var(--text-secondary); }
+input[type="range"] { flex: 1; min-width: 200px; accent-color: var(--series-2); }
+.year { font-size: 32px; font-weight: 600; min-width: 80px; }
+.legend { display: flex; gap: 18px; font-size: 13px; color: var(--text-secondary); align-items: center; }
+.legend .key { display: inline-block; width: 18px; height: 2px; border-radius: 1px; vertical-align: middle; margin-right: 6px; }
+
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; }
+@media (max-width: 1000px) { .layout { grid-template-columns: 1fr; } }
+.card {
+  background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px;
+  position: relative; overflow: hidden;
+}
+#map { display: block; width: 100%; height: auto; cursor: grab; }
+#map:active { cursor: grabbing; }
+.land { fill: var(--land); stroke: var(--grid); stroke-width: 0.5px; }
+.graticule { fill: none; stroke: var(--grid); stroke-width: 0.5px; }
+.route { fill: none; stroke-linecap: round; pointer-events: none; }
+.route.old { stroke: var(--series-1); stroke-width: 1.25px; opacity: 0.45; }
+.route.new { stroke: var(--series-2); stroke-width: 2px; }
+.route.hover { opacity: 1; stroke-width: 3px; }
+.hit { fill: none; stroke: transparent; stroke-width: 12px; cursor: pointer; }
+.city { stroke: var(--surface-1); stroke-width: 2px; }
+.city.old { fill: var(--series-1); }
+.city.new { fill: var(--series-2); }
+.city-label {
+  font-size: 11px; fill: var(--text-secondary); pointer-events: none;
+  paint-order: stroke; stroke: var(--surface-1); stroke-width: 3px; stroke-linejoin: round;
+}
+.map-hint { position: absolute; left: 12px; bottom: 10px; font-size: 12px; color: var(--text-muted); }
+
+.panel { padding: 16px; max-height: 640px; overflow-y: auto; }
+.panel h2 { font-size: 15px; margin: 0 0 4px; font-weight: 600; }
+.panel .stat { color: var(--text-secondary); font-size: 13px; margin-bottom: 12px; }
+.event { padding: 10px 0; border-top: 1px solid var(--grid); font-size: 13px; }
+.event .route-name { font-weight: 600; }
+.event .meta { color: var(--text-secondary); margin: 2px 0 4px; }
+.event .body { color: var(--text-secondary); line-height: 1.4; }
+.empty { color: var(--text-muted); font-size: 13px; }
+
+.tooltip {
+  position: fixed; pointer-events: none; z-index: 10; max-width: 300px;
+  background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
+  padding: 8px 10px; font-size: 13px; box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  opacity: 0; transition: opacity 80ms;
+}
+.tooltip .v { font-weight: 600; color: var(--text-primary); }
+.tooltip .s { color: var(--text-secondary); margin-top: 2px; }
+
+#table-view { display: none; margin-top: 16px; }
+#table-view.open { display: block; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--grid); vertical-align: top; }
+th { color: var(--text-secondary); font-weight: 600; position: sticky; top: 0; background: var(--surface-1); }
+td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.table-scroll { max-height: 480px; overflow-y: auto; }
+</style>
+</head>
+<body>
+<div class="viz-root">
+  <header>
+    <h1>Le réseau Air France dans le temps</h1>
+    <p>Les lignes ouvertes ou inaugurées, d'après les éphémérides du musée Air France.</p>
+    <span class="sample-note" id="sample-note"></span>
+  </header>
+
+  <div class="controls">
+    <button id="play" aria-label="Lancer l'animation">▶ Lecture</button>
+    <span class="year" id="year-label" aria-live="polite"></span>
+    <input type="range" id="year" aria-label="Année">
+    <button id="cumul" aria-pressed="true">Cumul depuis le début</button>
+    <button id="table-toggle" aria-pressed="false">Vue tableau</button>
+  </div>
+  <div class="legend">
+    <span><span class="key" style="background: var(--series-2)"></span>Ouverte l'année affichée</span>
+    <span id="legend-old"><span class="key" style="background: var(--series-1); opacity: .6"></span>Ouverte les années précédentes (les fermetures ne sont pas représentées)</span>
+  </div>
+
+  <div class="layout" style="margin-top: 12px">
+    <div class="card">
+      <svg id="map" role="img" aria-label="Carte du monde des lignes Air France ouvertes"></svg>
+      <div class="map-hint">Molette pour zoomer · glisser pour déplacer · survoler une ligne pour le détail</div>
+    </div>
+    <aside class="card panel" id="panel" aria-live="polite"></aside>
+  </div>
+
+  <section class="card" id="table-view">
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Date</th><th>Itinéraire</th><th>Avion</th><th>Événement</th></tr></thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+  </section>
+  <div class="tooltip" id="tooltip" role="tooltip"></div>
+</div>
+
+<script>
+const DATA = /*__DATA__*/null;
+
+const routes = DATA.routes.map((r, i) => ({ ...r, id: i, label: r.cities.map(c => c.name).join(" → ") }));
+const firstYear = d3.min(routes, r => r.year);
+const lastYear = d3.max(routes, r => r.year);
+// A year in the URL (carte_reseau.html#1975) opens the map on that year.
+let year = Math.min(lastYear, Math.max(firstYear, +location.hash.slice(1) || firstYear));
+let cumulative = true;
+let timer = null;
+
+const el = id => document.getElementById(id);
+el("sample-note").textContent =
+  `Mode échantillon : ${DATA.analysed} textes analysés par IA sur ${DATA.totalTexts.toLocaleString("fr-FR")} · ` +
+  `${routes.length} lignes extraites`;
+
+const W = 1200, H = 640;
+const svg = d3.select("#map").attr("viewBox", `0 0 ${W} ${H}`);
+const projection = d3.geoNaturalEarth1().scale(215).translate([W / 2 - 40, H / 2 + 20]).rotate([-10, 0]);
+const path = d3.geoPath(projection);
+const g = svg.append("g");
+const gLand = g.append("g"), gRoutes = g.append("g"), gHits = g.append("g"), gCities = g.append("g"), gLabels = g.append("g");
+let zoomK = 1;
+
+svg.call(d3.zoom().scaleExtent([1, 12]).translateExtent([[0, 0], [W, H]]).on("zoom", ev => {
+  zoomK = ev.transform.k;
+  g.attr("transform", ev.transform);
+  // Keep dots and labels at constant screen size while zooming (strokes use non-scaling-stroke).
+  gCities.selectAll("circle").attr("r", d => d.r / zoomK).style("stroke-width", 2 / zoomK);
+  gLabels.selectAll("text").style("font-size", `${11 / zoomK}px`).style("stroke-width", 3 / zoomK)
+    .attr("dy", -6 / zoomK);
+}));
+
+g.append("path").datum(d3.geoGraticule10()).attr("class", "graticule").attr("d", path);
+d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json").then(world => {
+  gLand.selectAll("path").data(topojson.feature(world, world.objects.countries).features)
+    .join("path").attr("class", "land").attr("d", path);
+});
+
+const lineOf = r => ({ type: "LineString", coordinates: r.cities.map(c => [c.lon, c.lat]) });
+
+// Tooltip: values via textContent only (texts come from the data).
+const tip = el("tooltip");
+function showTip(ev, r) {
+  tip.replaceChildren();
+  const v = document.createElement("div"); v.className = "v"; v.textContent = r.label;
+  const s = document.createElement("div"); s.className = "s";
+  s.textContent = [new Date(r.date).toLocaleDateString("fr-FR", { year: "numeric", month: "long", day: "numeric" }),
+                   r.aircraft, r.cargo ? "cargo" : null].filter(Boolean).join(" · ");
+  const t = document.createElement("div"); t.className = "s"; t.textContent = r.title;
+  tip.append(v, s, t);
+  moveTip(ev);
+  tip.style.opacity = 1;
+}
+function moveTip(ev) {
+  const x = Math.min(ev.clientX + 14, window.innerWidth - 320);
+  tip.style.left = `${x}px`; tip.style.top = `${ev.clientY + 14}px`;
+}
+function hideTip() { tip.style.opacity = 0; }
+
+function visibleRoutes() {
+  return routes.filter(r => cumulative ? r.year <= year : r.year === year);
+}
+
+function render(animate) {
+  const shown = visibleRoutes();
+  el("year-label").textContent = year;
+  el("year").value = year;
+  el("legend-old").style.display = cumulative ? "" : "none";
+
+  gRoutes.selectAll("path").data(shown, r => r.id).join(
+    enter => {
+      const p = enter.append("path").attr("d", r => path(lineOf(r))).attr("vector-effect", "non-scaling-stroke");
+      if (animate) {
+        p.each(function () {
+          const len = this.getTotalLength();
+          d3.select(this).attr("stroke-dasharray", `${len} ${len}`).attr("stroke-dashoffset", len)
+            .transition().duration(700).ease(d3.easeCubicOut).attr("stroke-dashoffset", 0)
+            .on("end", function () { d3.select(this).attr("stroke-dasharray", null); });
+        });
+      }
+      return p;
+    }
+  ).attr("class", r => `route ${r.year === year ? "new" : "old"}`)
+   .sort((a, b) => (a.year === year) - (b.year === year));
+
+  gHits.selectAll("path").data(shown, r => r.id).join("path")
+    .attr("class", "hit").attr("d", r => path(lineOf(r))).attr("vector-effect", "non-scaling-stroke")
+    .on("pointerenter", (ev, r) => {
+      gRoutes.selectAll("path").filter(d => d.id === r.id).classed("hover", true).raise();
+      showTip(ev, r);
+    })
+    .on("pointermove", moveTip)
+    .on("pointerleave", (ev, r) => {
+      gRoutes.selectAll("path").filter(d => d.id === r.id).classed("hover", false);
+      hideTip();
+    });
+
+  // One dot per city; a city served this year wins over older appearances.
+  const cities = new Map();
+  for (const r of shown) for (const c of r.cities) {
+    const key = `${c.lat.toFixed(1)},${c.lon.toFixed(1)}`;
+    const isNew = r.year === year;
+    if (!cities.has(key) || isNew) cities.set(key, { ...c, key, isNew, r: isNew ? 4 : 3 });
+  }
+  const cityList = [...cities.values()].sort((a, b) => a.isNew - b.isNew);
+  gCities.selectAll("circle").data(cityList, c => c.key).join("circle")
+    .attr("class", c => `city ${c.isNew ? "new" : "old"}`)
+    .attr("cx", c => projection([c.lon, c.lat])[0]).attr("cy", c => projection([c.lon, c.lat])[1])
+    .attr("r", c => c.r / zoomK).style("stroke-width", 2 / zoomK);
+
+  // Direct labels only for the cities of the displayed year.
+  gLabels.selectAll("text").data(cityList.filter(c => c.isNew), c => c.key).join("text")
+    .attr("class", "city-label").attr("text-anchor", "middle")
+    .attr("x", c => projection([c.lon, c.lat])[0]).attr("y", c => projection([c.lon, c.lat])[1])
+    .attr("dy", -6 / zoomK).style("font-size", `${11 / zoomK}px`).style("stroke-width", 3 / zoomK)
+    .text(c => c.name);
+
+  renderPanel(shown);
+}
+
+function renderPanel(shown) {
+  const panel = el("panel");
+  panel.replaceChildren();
+  const ofYear = routes.filter(r => r.year === year);
+  const h = document.createElement("h2"); h.textContent = `Ouvertures en ${year}`;
+  const stat = document.createElement("div"); stat.className = "stat";
+  const cityCount = new Set(shown.flatMap(r => r.cities.map(c => c.name))).size;
+  const plural = (n, word) => `${n} ${word}${n > 1 ? "s" : ""}`;
+  stat.textContent = cumulative
+    ? `${plural(shown.length, "ligne")} et ${plural(cityCount, "ville")} cumulées depuis ${firstYear}`
+    : `${plural(shown.length, "ligne")} cette année`;
+  panel.append(h, stat);
+  if (!ofYear.length) {
+    const p = document.createElement("p"); p.className = "empty";
+    p.textContent = "Aucune ouverture dans l'échantillon pour cette année.";
+    panel.append(p);
+  }
+  for (const r of ofYear) {
+    const div = document.createElement("div"); div.className = "event";
+    const name = document.createElement("div"); name.className = "route-name"; name.textContent = r.label;
+    const meta = document.createElement("div"); meta.className = "meta";
+    meta.textContent = [new Date(r.date).toLocaleDateString("fr-FR"), r.aircraft, r.cargo ? "cargo" : null].filter(Boolean).join(" · ");
+    const body = document.createElement("div"); body.className = "body"; body.textContent = r.text;
+    div.append(name, meta, body);
+    panel.append(div);
+  }
+}
+
+function renderTable() {
+  const tbody = el("table-body");
+  tbody.replaceChildren(...routes.map(r => {
+    const tr = document.createElement("tr");
+    for (const [v, cls] of [[r.date, "num"], [r.label], [r.aircraft || "—"], [r.title]]) {
+      const td = document.createElement("td"); td.textContent = v; if (cls) td.className = cls; tr.append(td);
+    }
+    return tr;
+  }));
+}
+
+const slider = el("year");
+slider.min = firstYear; slider.max = lastYear; slider.step = 1;
+slider.addEventListener("input", () => { stop(); year = +slider.value; render(true); });
+
+const yearsWithRoutes = new Set(routes.map(r => r.year));
+function stop() { clearTimeout(timer); timer = null; el("play").textContent = "▶ Lecture"; }
+function step() {
+  if (year >= lastYear) return stop();
+  year += 1;
+  render(true);
+  // Linger on years that have openings, skip quickly through empty ones.
+  timer = setTimeout(step, yearsWithRoutes.has(year) ? 1100 : 150);
+}
+el("play").addEventListener("click", () => {
+  if (timer) return stop();
+  if (year >= lastYear) year = firstYear - 1;
+  el("play").textContent = "❚❚ Pause";
+  timer = setTimeout(step, 0);
+});
+el("cumul").addEventListener("click", ev => {
+  cumulative = !cumulative;
+  ev.currentTarget.setAttribute("aria-pressed", cumulative);
+  render(false);
+});
+el("table-toggle").addEventListener("click", ev => {
+  const open = el("table-view").classList.toggle("open");
+  ev.currentTarget.setAttribute("aria-pressed", open);
+  if (open) el("table-view").scrollIntoView({ behavior: "smooth" });
+});
+
+renderTable();
+render(false);
+</script>
+</body>
+</html>

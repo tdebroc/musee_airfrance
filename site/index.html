@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Musée Air France — l&#x27;aérogare des éphémérides</title><style>
+:root { --bg:#f1ede6; --card:#fffdf9; --ink:#1c2230; --muted:#5d6574; --line:#e0dacf; --accent:#002157; --accent2:#d4001a;
+  --mu-sign:#1d232c; --mu-sign-ink:#ffd200; --mu-grass:#dde5d1; --mu-apron:#cfd4da; --mu-runway:#59606b; --mu-build:#f8f6f2;
+  --mu-wall:#9aa3ae; --mu-room:#ffffff; --mu-floor:#e2dbcf; --mu-board:#0c0f14; }
+@media (prefers-color-scheme: dark) { :root { --bg:#12161d; --card:#1a1f29; --ink:#e8ebf1; --muted:#9aa3b2; --line:#2b3340; --accent:#8fb5ff; --accent2:#ff6b7a;
+  --mu-sign:#0a0d12; --mu-grass:#141c17; --mu-apron:#222831; --mu-runway:#363d48; --mu-build:#2c333e; --mu-wall:#566070; --mu-room:#1e2531; --mu-floor:#0e1117; } }
+* { box-sizing:border-box; }
+html { background:var(--bg); }
+body { margin:0; font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--ink);
+  background:radial-gradient(1200px 380px at 50% -120px, color-mix(in srgb, #fff 55%, transparent), transparent 70%), var(--bg); min-height:100vh; }
+@media (prefers-color-scheme: dark) { body { background:radial-gradient(1200px 380px at 50% -120px, #ffffff14, transparent 70%), var(--bg); } }
+a { color:var(--accent); }
+.card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px; }
+@view-transition { navigation:auto; }
+::view-transition-old(root) { animation:.32s ease both mu-out; } ::view-transition-new(root) { animation:.38s ease both mu-in; }
+@keyframes mu-out { to { opacity:0; transform:scale(1.03); } } @keyframes mu-in { from { opacity:0; transform:scale(.98); } }
+@media (prefers-reduced-motion: reduce) { ::view-transition-old(root), ::view-transition-new(root) { animation:none; } .mu-traffic { display:none; } }
+
+/* airport signage */
+.mu-sign { view-transition-name:mu-sign; position:sticky; top:0; z-index:20; display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+  padding:9px 20px; background:var(--mu-sign); color:var(--mu-sign-ink); font-weight:600; letter-spacing:.02em; box-shadow:0 2px 10px #0004; }
+.mu-sign a, .mu-sign .mu-btn { color:var(--mu-sign-ink); text-decoration:none; }
+.mu-sign .mu-logo { font-weight:800; font-size:16px; white-space:nowrap; }
+.mu-sign .mu-logo i { font-style:normal; display:inline-block; transform:rotate(-45deg); margin-right:6px; }
+.mu-sign .mu-where { display:flex; align-items:center; gap:10px; color:#fff; font-weight:500; min-width:0; }
+.mu-gate { display:inline-grid; place-items:center; min-width:34px; height:28px; padding:0 7px; border-radius:6px; background:var(--w, var(--accent)); color:#fff; font-weight:800; }
+.mu-sign .mu-gate { background:var(--mu-sign-ink); color:var(--mu-sign); }
+.mu-sign nav { margin-left:auto; min-width:0; display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+.mu-sign nav a, .mu-sign .mu-btn { font:600 14px system-ui,sans-serif; padding:5px 11px; border:1px solid #ffffff2e; border-radius:6px; background:transparent; cursor:pointer; white-space:nowrap; }
+.mu-sign nav a:hover, .mu-sign .mu-btn:hover { background:#ffffff1a; }
+.mu-sign .mu-pass { font-size:13px; color:#cfd6e2; font-weight:500; white-space:nowrap; }
+.mu-sign .mu-pass b { color:var(--mu-sign-ink); }
+
+/* a room */
+.mu-wall { max-width:1280px; margin:0 auto; padding:26px 22px 10px; }
+.mu-cartel { display:flex; gap:18px; align-items:stretch; margin:0 0 22px; }
+.mu-thumb { flex:0 0 280px; padding:6px; border:1px solid var(--line); border-radius:10px; background:var(--card); cursor:pointer; display:flex; flex-direction:column; gap:4px;
+  color:var(--muted); font:600 12px system-ui,sans-serif; letter-spacing:.06em; text-transform:uppercase; box-shadow:0 10px 28px -18px #0008; }
+.mu-thumb:hover { border-color:var(--accent); color:var(--ink); } .mu-thumb .mu-plan { border-radius:6px; }
+@media (max-width:900px) { .mu-thumb { display:none; } }
+.mu-plaque { flex:1; background:var(--card); border:1px solid var(--line); border-left:6px solid var(--w); border-radius:4px 10px 10px 4px;
+  padding:16px 22px; box-shadow:0 10px 28px -18px #0008; }
+.mu-kicker { margin:0 0 4px; font-size:12.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); font-weight:600; }
+.mu-plaque h1 { margin:0 0 6px; font:700 30px/1.15 Georgia,"Iowan Old Style","Times New Roman",serif; }
+.mu-plaque .lead { margin:0; color:var(--muted); max-width:80ch; }
+.mu-vitrine { position:relative; padding:22px; border-radius:14px; border:1px solid var(--line);
+  background:linear-gradient(180deg, color-mix(in srgb, var(--card) 70%, transparent), color-mix(in srgb, var(--card) 35%, transparent));
+  box-shadow:0 30px 60px -40px #0009, inset 0 1px 0 #ffffff40; }
+.mu-vitrine::before { content:""; position:absolute; inset:-26px 8% auto; height:26px; pointer-events:none;
+  background:radial-gradient(closest-side, color-mix(in srgb, #ffe9a8 60%, transparent), transparent); opacity:.7; }
+.mu-doors { max-width:1280px; margin:0 auto; padding:18px 22px 30px; display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:end; }
+.mu-door { display:flex; flex-direction:column; gap:2px; padding:22px 18px 14px; min-height:112px; justify-content:flex-end; text-decoration:none; color:var(--ink);
+  background:linear-gradient(180deg, color-mix(in srgb, var(--w) 20%, var(--card)), var(--card)); border:2px solid color-mix(in srgb, var(--w) 45%, var(--line));
+  border-bottom-width:6px; border-radius:60px 60px 6px 6px; transition:border-color .15s, box-shadow .15s; }
+.mu-door:hover { border-color:var(--w); box-shadow:0 12px 26px -16px var(--w); }
+.mu-door small { color:var(--muted); font-weight:600; letter-spacing:.05em; text-transform:uppercase; font-size:12px; }
+.mu-door b { font-size:16px; }
+.mu-door.next { text-align:right; } .mu-door.off { visibility:hidden; }
+.mu-hallbtn { display:grid; place-items:center; gap:4px; text-decoration:none; color:var(--ink); font-weight:600; padding:10px 18px; }
+.mu-hallbtn span { display:grid; place-items:center; width:46px; height:46px; border-radius:50%; background:var(--mu-sign); color:var(--mu-sign-ink); font-size:22px; }
+@media (max-width:760px) { .mu-doors { grid-template-columns:1fr 1fr; } .mu-hallbtn { grid-column:1 / -1; order:3; } .mu-plaque h1 { font-size:24px; } }
+.mu-foot { text-align:center; color:var(--muted); font-size:12.5px; padding:16px; border-top:1px solid var(--line); background:var(--mu-floor); }
+
+/* plan drawer in the rooms */
+.mu-drawer { position:fixed; inset:0; z-index:40; background:#0009; display:grid; place-items:start center; padding:70px 16px 16px; overflow:auto; }
+.mu-drawer[hidden] { display:none; }
+.mu-drawer-box { width:min(1180px, 100%); background:var(--card); border-radius:14px; padding:18px; box-shadow:0 30px 80px #0008; }
+.mu-drawer-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-weight:700; font-size:18px; }
+.mu-close { font:600 14px system-ui,sans-serif; padding:6px 12px; border:1px solid var(--line); border-radius:6px; background:var(--card); color:var(--ink); cursor:pointer; }
+.mu-legend { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:4px 18px; margin-top:12px; font-size:14px; }
+.mu-legend a { display:flex; gap:8px; align-items:center; text-decoration:none; color:var(--ink); padding:3px 0; }
+.mu-legend a:hover b { text-decoration:underline; } .mu-legend .mu-gate { min-width:30px; height:22px; font-size:12px; }
+.mu-legend a.mu-cur b { color:var(--accent2); }
+.mu-legend a.mu-done::after { content:"✓"; color:#2e9e5b; font-weight:700; }
+
+/* the plan */
+.mu-plan { display:block; width:100%; height:auto; }
+.mu-plan .mu-grass { fill:var(--mu-grass); } .mu-plan .mu-apron { fill:var(--mu-apron); }
+.mu-plan .mu-runway { fill:var(--mu-runway); } .mu-plan .mu-rwline { stroke:#fff; stroke-width:3; stroke-dasharray:30 24; opacity:.75; }
+.mu-plan text.mu-rwnum { fill:#fff; font:700 18px system-ui,sans-serif; opacity:.8; }
+.mu-plan .mu-build { fill:var(--mu-build); stroke:var(--mu-wall); stroke-width:2; }
+.mu-plan .mu-glass { fill:color-mix(in srgb, #4aa3df 35%, var(--mu-build)); }
+.mu-plan .mu-leadin { stroke:#e9b900; stroke-width:2.5; stroke-dasharray:10 7; }
+.mu-plan .mu-tip { fill:var(--mu-sign); stroke:var(--w); stroke-width:3; }
+.mu-plan text.mu-signletter { fill:var(--mu-sign-ink); font:800 24px system-ui,sans-serif; text-anchor:middle; dominant-baseline:central; }
+.mu-plan .mu-parked, .mu-plan .mu-moving { fill:#fbfbfd; stroke:#7d8693; stroke-width:1.4; }
+.mu-plan .mu-tail { fill:var(--w); }
+.mu-plan text.mu-wn { fill:var(--ink); font:800 17px system-ui,sans-serif; }
+.mu-plan text.mu-ws { fill:var(--muted); font:600 13px system-ui,sans-serif; letter-spacing:.06em; }
+.mu-plan text.mu-entry { fill:var(--accent2); font:800 15px system-ui,sans-serif; letter-spacing:.2em; }
+.mu-plan .mu-arrow { fill:none; stroke:var(--accent2); stroke-width:3; stroke-linecap:round; stroke-linejoin:round; }
+.mu-plan .mu-bridge { fill:none; stroke:var(--mu-wall); stroke-width:16; stroke-linejoin:round; }
+.mu-plan .mu-concorde { fill:#fbfbfd; stroke:#7d8693; stroke-width:1.6; }
+.mu-plan .mu-fin { stroke:#7d8693; stroke-width:3; } .mu-plan .mu-window { fill:#7fa6c9; }
+.mu-plan text.mu-reg { fill:#7d8693; font:700 12px system-ui,sans-serif; letter-spacing:.2em; }
+.mu-plan .mu-cabin { fill:var(--w); opacity:0; transition:opacity .15s; }
+.mu-plan .mu-leader { stroke:var(--w); stroke-width:1.5; stroke-dasharray:4 4; }
+.mu-plan .mu-room { cursor:pointer; outline:none; }
+.mu-plan .mu-roombox { fill:var(--mu-room); stroke:var(--mu-wall); stroke-width:1.5; transition:fill .15s, stroke .15s; }
+.mu-plan a.mu-room:hover .mu-roombox, .mu-plan a.mu-room:focus-visible .mu-roombox { fill:color-mix(in srgb, var(--w) 16%, var(--mu-room)); stroke:var(--w); stroke-width:3.5; }
+.mu-plan a.mu-room:hover .mu-cabin, .mu-plan a.mu-room:focus-visible .mu-cabin, .mu-plan .mu-here .mu-cabin { opacity:.55; }
+.mu-plan a.mu-room:focus-visible .mu-roombox { stroke-width:5; }
+.mu-plan .mu-badge { fill:var(--w); }
+.mu-plan text.mu-c { fill:#fff; font:800 13px system-ui,sans-serif; text-anchor:middle; dominant-baseline:central; pointer-events:none; }
+.mu-plan text.mu-cbig { font-size:24px; }
+.mu-plan text.mu-t { fill:var(--ink); font:600 14.5px system-ui,sans-serif; dominant-baseline:central; pointer-events:none; }
+.mu-plan text.mu-sub { fill:var(--w); font-size:12px; text-transform:uppercase; letter-spacing:.08em; font-weight:800; }
+.mu-plan text.mu-info-i { fill:var(--w); font:italic 800 30px Georgia,serif; text-anchor:middle; dominant-baseline:central; pointer-events:none; }
+.mu-plan .mu-here .mu-roombox { fill:var(--w); stroke:var(--w); }
+.mu-plan .mu-here .mu-badge { fill:#fff; } .mu-plan .mu-here text.mu-c { fill:var(--w); } .mu-plan .mu-here text.mu-info-i { fill:#fff; }
+.mu-plan a.mu-closed { cursor:not-allowed; opacity:.45; }
+.mu-plan .mu-seen { display:none; } .mu-plan .seen .mu-seen { display:inline; }
+.mu-plan .mu-seen circle { fill:#2e9e5b; } .mu-plan .mu-seen path { fill:none; stroke:#fff; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
+.mu-plan .mu-me { pointer-events:none; } .mu-plan .mu-dot { fill:var(--accent2); stroke:#fff; stroke-width:3; }
+.mu-plan .mu-halo { fill:var(--accent2); opacity:.25; transform-box:fill-box; transform-origin:center; animation:mu-pulse 1.8s ease-out infinite; }
+@keyframes mu-pulse { from { transform:scale(.5); opacity:.45; } to { transform:scale(1.6); opacity:0; } }
+@media (prefers-reduced-motion: reduce) { .mu-plan .mu-halo { animation:none; } }
+
+/* home */
+.mu-home { max-width:1820px; margin:0 auto; padding:22px; }
+.mu-hero { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:24px; align-items:center; margin-bottom:18px; }
+.mu-hero h1 { margin:0 0 6px; font:700 40px/1.1 Georgia,"Iowan Old Style","Times New Roman",serif; }
+.mu-hero p.mu-lead { margin:0; color:var(--muted); font-size:16.5px; max-width:78ch; }
+.mu-ticket { display:grid; grid-template-columns:auto auto; border-radius:12px; overflow:hidden; box-shadow:0 18px 40px -24px #000a; min-width:360px; }
+.mu-ticket > div { padding:14px 18px; background:var(--card); }
+.mu-ticket .mu-stub { background:#002157; color:#fff; border-left:2px dashed #ffffff80; display:grid; place-items:center; text-align:center; gap:6px; }
+.mu-ticket .mu-stub a { color:#002157; background:#fff; padding:6px 12px; border-radius:6px; font-weight:700; text-decoration:none; white-space:nowrap; }
+.mu-ticket small { display:block; color:var(--muted); font-size:11px; letter-spacing:.08em; text-transform:uppercase; font-weight:700; }
+.mu-ticket .mu-stub small { color:#ffffffb0; }
+.mu-ticket .mu-big { font-size:22px; font-weight:800; }
+.mu-stamps { display:flex; gap:3px; margin-top:8px; flex-wrap:wrap; max-width:260px; }
+.mu-stamps i { width:12px; height:12px; border-radius:3px; background:var(--line); } .mu-stamps i.on { background:var(--w); }
+.mu-planwrap { position:relative; border-radius:16px; overflow:hidden; border:1px solid var(--line); box-shadow:0 30px 60px -40px #000a; }
+.mu-info { position:absolute; left:16px; bottom:16px; width:min(380px, calc(100% - 32px)); background:color-mix(in srgb, var(--card) 94%, transparent);
+  border:1px solid var(--line); border-left:6px solid var(--w, var(--accent)); border-radius:10px; padding:12px 14px; box-shadow:0 12px 30px -14px #0008; backdrop-filter:blur(6px); }
+.mu-info b { display:block; font-size:17px; margin:4px 0 2px; } .mu-info p { margin:0 0 8px; color:var(--muted); font-size:13.5px; }
+.mu-info a { font-weight:700; } .mu-info small { color:var(--muted); font-weight:600; margin-left:6px; }
+.mu-hint { color:var(--muted); font-size:13.5px; margin:10px 2px 26px; }
+.mu-board { background:var(--mu-board); color:#ffd200; border-radius:14px; padding:14px 18px 18px; box-shadow:0 20px 50px -30px #000; overflow-x:auto; }
+.mu-board h2 { margin:2px 0 10px; font:800 20px system-ui,sans-serif; letter-spacing:.12em; color:#fff; display:flex; gap:12px; align-items:center; }
+.mu-board h2 span { color:#ffd200; }
+.mu-board table { width:100%; border-collapse:separate; border-spacing:0 4px; font:600 15px ui-monospace,"SF Mono",Menlo,Consolas,monospace; text-transform:uppercase; }
+.mu-board th { text-align:left; color:#8a93a3; font-size:12px; letter-spacing:.12em; padding:0 10px; }
+.mu-board td { background:#1a1f28; padding:7px 10px; white-space:nowrap; }
+.mu-board tr td:first-child { border-radius:4px 0 0 4px; } .mu-board tr td:last-child { border-radius:0 4px 4px 0; }
+.mu-board tbody tr { cursor:pointer; } .mu-board tbody tr:hover td { background:#262d39; }
+.mu-board a { color:#ffd200; text-decoration:none; } .mu-board td.mu-dest { white-space:normal; min-width:240px; }
+.mu-board .mu-st { color:#3ddc84; } .mu-board .mu-st.done { color:#9aa3b2; } .mu-board .mu-st.ko { color:#ff6b7a; }
+.mu-board .mu-st.go::before { content:"● "; animation:mu-blink 1.2s steps(2) infinite; }
+@keyframes mu-blink { 50% { opacity:.2; } }
+@media (max-width:900px) { .mu-hero { grid-template-columns:minmax(0,1fr); } .mu-ticket { min-width:0; grid-template-columns:minmax(0,1fr); }
+  .mu-ticket .mu-stub { border-left:0; border-top:2px dashed #ffffff80; } .mu-hero h1 { font-size:30px; } .mu-info { position:static; width:auto; border-radius:0; } }
+@media (max-width:600px) { .mu-sign { padding:8px 12px; gap:6px 10px; } .mu-sign nav { margin-left:0; } .mu-sign .mu-where > span { display:none; }
+  .mu-home, .mu-wall { padding-left:12px; padding-right:12px; } .mu-vitrine { padding:10px; } }
+</style></head><body><header class="mu-sign"><a class="mu-logo" href="index.html"><i>✈</i>Musée Air France</a><span class="mu-where"><span>Hall d'accueil · Plan du musée</span></span><nav><a href="carte-reseau.html">Commencer la visite →</a><a href="#mu-departs">Départs</a></nav><span class="mu-pass" title="Salles visitées dans ce navigateur">Carte d'embarquement : <b data-mu-visits>0</b></span></header>
+<main class="mu-home">
+  <section class="mu-hero">
+    <div><p class="mu-kicker">Aérogare des éphémérides · 16 salles</p>
+      <h1>Bienvenue au Musée Air France</h1>
+      <p class="mu-lead">10 436 éphémérides de la compagnie, lues et structurées une à une, exposées dans une aérogare : 4 jetées, un hall d'accueil et un Concorde à quai. Chaque porte ouvre une salle. Cliquez sur une salle du plan pour vous y rendre.</p></div>
+    <div class="mu-ticket"><div><small>Carte d'embarquement · passager</small><span class="mu-big">Visiteur</span>
+        <small style="margin-top:8px">Salles visitées</small><span class="mu-big" data-mu-visits>0</span><div class="mu-stamps"><i data-slug="carte-reseau" style="--w:#1f5fbf" title="A1 · Carte animée du réseau"></i><i data-slug="monde-retrecit" style="--w:#1f5fbf" title="A2 · Le monde rétrécit"></i><i data-slug="villes-renommees" style="--w:#1f5fbf" title="A3 · Villes renommées"></i><i data-slug="prix-billets" style="--w:#1f5fbf" title="A4 · Prix des billets"></i><i data-slug="frise-avions" style="--w:#0f7f7a" title="B1 · Frise des avions"></i><i data-slug="vie-avion" style="--w:#0f7f7a" title="B2 · La vie d&#x27;un avion"></i><i data-slug="chiffres" style="--w:#0f7f7a" title="B3 · Air France en chiffres"></i><i data-slug="ce-jour-la" style="--w:#b35f12" title="C1 · Ce jour-là chez Air France"></i><i data-slug="personnages-lieux" style="--w:#b35f12" title="C2 · Personnages et lieux"></i><i data-slug="graphe-personnes" style="--w:#b35f12" title="C3 · Le graphe des personnes"></i><i data-slug="genealogie" style="--w:#b35f12" title="C4 · Généalogie des compagnies"></i><i data-slug="greves-records" style="--w:#c0283a" title="D1 · Grèves et accidents face aux records"></i><i data-slug="barometre-crises" style="--w:#c0283a" title="D2 · Baromètre des crises"></i><i data-slug="quiz" style="--w:#6a4cb5" title="K1 · Le Grand Quiz"></i><i data-slug="devine-annee" style="--w:#6a4cb5" title="K2 · Devine l&#x27;année"></i><i data-slug="demande-musee" style="--w:#b0307a" title="H1 · Demande au musée"></i></div></div>
+      <div class="mu-stub"><small>Prochaine porte</small><span id="mu-next"></span><a id="mu-go" href="carte-reseau.html">Commencer la visite →</a></div></div>
+  </section>
+  <section class="mu-planwrap"><svg class="mu-plan" viewBox="0 0 1760 1000" role="img" aria-label="Plan du musée"><rect class="mu-grass" width="1760" height="1000"/><rect class="mu-apron" x="20" y="64" width="1720" height="872" rx="34"/><rect class="mu-runway" x="40" y="14" width="1680" height="40" rx="4"/><line class="mu-rwline" x1="90" y1="34" x2="1670" y2="34"/><text class="mu-rwnum" x="62" y="40">09</text><text class="mu-rwnum" x="1698" y="40" text-anchor="end">27</text><rect class="mu-runway" x="40" y="946" width="1680" height="40" rx="4"/><line class="mu-rwline" x1="90" y1="966" x2="1670" y2="966"/><text class="mu-rwnum" x="62" y="972">09</text><text class="mu-rwnum" x="1698" y="972" text-anchor="end">27</text><g class="mu-traffic"><g><path class="mu-moving" d="M0,-50C3.5,-47 5,-40 5,-32L5,-8L46,12L46,18L5,8L5,32L17,42L17,47L3,44L0,50L-3,44L-17,47L-17,42L-5,32L-5,8L-46,18L-46,12L-5,-8L-5,-32C-5,-40 -3.5,-47 0,-50Z" transform="rotate(90) scale(.9)"/><animateMotion dur="16s" repeatCount="indefinite" keyPoints="0;0;1" keyTimes="0;.35;1" calcMode="spline" keySplines="0 0 1 1;.6 0 1 1" path="M175,34 L1880,34"/></g><g><path class="mu-moving" d="M0,-50C3.5,-47 5,-40 5,-32L5,-8L46,12L46,18L5,8L5,32L17,42L17,47L3,44L0,50L-3,44L-17,47L-17,42L-5,32L-5,8L-46,18L-46,12L-5,-8L-5,-32C-5,-40 -3.5,-47 0,-50Z" transform="rotate(-90) scale(.9)"/><animateMotion dur="21s" begin="-6s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;.55;1" calcMode="spline" keySplines="0 .4 .4 1;0 0 1 1" path="M1900,966 L260,966"/></g></g><line class="mu-leadin" x1="330" y1="200.0" x2="330" y2="54.0"/><rect class="mu-build" x="311.0" y="198.0" width="38" height="248.0"/><g style="--w:#1f5fbf"><circle class="mu-tip" cx="330" cy="200.0" r="24"/><text class="mu-signletter" x="330" y="200.0">A</text></g><path class="mu-parked" d="M0,-50C3.5,-47 5,-40 5,-32L5,-8L46,12L46,18L5,8L5,32L17,42L17,47L3,44L0,50L-3,44L-17,47L-17,42L-5,32L-5,8L-46,18L-46,12L-5,-8L-5,-32C-5,-40 -3.5,-47 0,-50Z" transform="translate(330,114.0) rotate(180) scale(1.05)"/><rect class="mu-tail" x="328" y="161" width="4" height="6" style="--w:#1f5fbf"/><text class="mu-wn" x="394" y="110.0">Jetée A</text><text class="mu-ws" x="394" y="129.0">Le Réseau</text><line class="mu-leadin" x1="570" y1="800.0" x2="570" y2="946.0"/><rect class="mu-build" x="551.0" y="554.0" width="38" height="248.0"/><g style="--w:#0f7f7a"><circle class="mu-tip" cx="570" cy="800.0" r="24"/><text class="mu-signletter" x="570" y="800.0">B</text></g><path class="mu-parked" d="M0,-50C3.5,-47 5,-40 5,-32L5,-8L46,12L46,18L5,8L5,32L17,42L17,47L3,44L0,50L-3,44L-17,47L-17,42L-5,32L-5,8L-46,18L-46,12L-5,-8L-5,-32C-5,-40 -3.5,-47 0,-50Z" transform="translate(570,886.0) rotate(0) scale(1.05)"/><rect class="mu-tail" x="568" y="833" width="4" height="6" style="--w:#0f7f7a"/><text class="mu-wn" x="634" y="882.0">Jetée B</text><text class="mu-ws" x="634" y="901.0">La Flotte</text><line class="mu-leadin" x1="810" y1="200.0" x2="810" y2="54.0"/><rect class="mu-build" x="791.0" y="198.0" width="38" height="248.0"/><g style="--w:#b35f12"><circle class="mu-tip" cx="810" cy="200.0" r="24"/><text class="mu-signletter" x="810" y="200.0">C</text></g><path class="mu-parked" d="M0,-50C3.5,-47 5,-40 5,-32L5,-8L46,12L46,18L5,8L5,32L17,42L17,47L3,44L0,50L-3,44L-17,47L-17,42L-5,32L-5,8L-46,18L-46,12L-5,-8L-5,-32C-5,-40 -3.5,-47 0,-50Z" transform="translate(810,114.0) rotate(180) scale(1.05)"/><rect class="mu-tail" x="808" y="161" width="4" height="6" style="--w:#b35f12"/><text class="mu-wn" x="874" y="110.0">Jetée C</text><text class="mu-ws" x="874" y="129.0">Les Mémoires</text><line class="mu-leadin" x1="1050" y1="708.0" x2="1050" y2="854.0"/><rect class="mu-build" x="1031.0" y="554.0" width="38" height="156.0"/><g style="--w:#c0283a"><circle class="mu-tip" cx="1050" cy="708.0" r="24"/><text class="mu-signletter" x="1050" y="708.0">D</text></g><path class="mu-parked" d="M0,-50C3.5,-47 5,-40 5,-32L5,-8L46,12L46,18L5,8L5,32L17,42L17,47L3,44L0,50L-3,44L-17,47L-17,42L-5,32L-5,8L-46,18L-46,12L-5,-8L-5,-32C-5,-40 -3.5,-47 0,-50Z" transform="translate(1050,794.0) rotate(0) scale(1.05)"/><rect class="mu-tail" x="1048" y="741" width="4" height="6" style="--w:#c0283a"/><text class="mu-wn" x="1114" y="790.0">Jetée D</text><text class="mu-ws" x="1114" y="809.0">Les Turbulences</text><rect class="mu-build mu-terminal" x="90" y="444.0" width="1160" height="112" rx="24"/><rect class="mu-glass" x="104" y="454.0" width="1132" height="6" rx="3"/><rect class="mu-glass" x="104" y="540.0" width="1132" height="6" rx="3"/><text class="mu-ws" x="116" y="478">AÉROGARE · HALL D'ACCUEIL</text><text class="mu-entry" x="44" y="506" transform="rotate(-90 44 500)" text-anchor="middle">ENTRÉE</text><path class="mu-arrow" d="M54,530 h26 m-9,-8 l9,8 l-9,8"/><path class="mu-bridge" d="M1250,470 H1370 V334.0 H1411"/><g transform="translate(1420,460) scale(1.05)"><path class="mu-concorde" d="M0,-180C4,-170 7,-150 8,-120L9,-40C30,10 70,70 98,128L98,140L9,142L9,165L4,180L-4,180L-9,165L-9,142L-98,140L-98,128C-70,70 -30,10 -9,-40L-8,-120C-7,-150 -4,-170 0,-180Z"/><line class="mu-fin" x1="0" y1="118" x2="0" y2="176"/><circle class="mu-window" cx="-5" cy="-150" r="1.6"/><circle class="mu-window" cx="5" cy="-150" r="1.6"/><circle class="mu-window" cx="-5" cy="-138" r="1.6"/><circle class="mu-window" cx="5" cy="-138" r="1.6"/><circle class="mu-window" cx="-5" cy="-126" r="1.6"/><circle class="mu-window" cx="5" cy="-126" r="1.6"/><circle class="mu-window" cx="-5" cy="-114" r="1.6"/><circle class="mu-window" cx="5" cy="-114" r="1.6"/><circle class="mu-window" cx="-5" cy="-102" r="1.6"/><circle class="mu-window" cx="5" cy="-102" r="1.6"/><circle class="mu-window" cx="-5" cy="-90" r="1.6"/><circle class="mu-window" cx="5" cy="-90" r="1.6"/><circle class="mu-window" cx="-5" cy="-78" r="1.6"/><circle class="mu-window" cx="5" cy="-78" r="1.6"/><circle class="mu-window" cx="-5" cy="-66" r="1.6"/><circle class="mu-window" cx="5" cy="-66" r="1.6"/><circle class="mu-window" cx="-5" cy="-54" r="1.6"/><circle class="mu-window" cx="5" cy="-54" r="1.6"/><circle class="mu-window" cx="-5" cy="-42" r="1.6"/><circle class="mu-window" cx="5" cy="-42" r="1.6"/><circle class="mu-window" cx="-5" cy="-30" r="1.6"/><circle class="mu-window" cx="5" cy="-30" r="1.6"/><circle class="mu-window" cx="-5" cy="-18" r="1.6"/><circle class="mu-window" cx="5" cy="-18" r="1.6"/><circle class="mu-window" cx="-5" cy="-6" r="1.6"/><circle class="mu-window" cx="5" cy="-6" r="1.6"/><circle class="mu-window" cx="-5" cy="6" r="1.6"/><circle class="mu-window" cx="5" cy="6" r="1.6"/><circle class="mu-window" cx="-5" cy="18" r="1.6"/><circle class="mu-window" cx="5" cy="18" r="1.6"/><circle class="mu-window" cx="-5" cy="30" r="1.6"/><circle class="mu-window" cx="5" cy="30" r="1.6"/></g><text class="mu-reg" x="1420" y="578" text-anchor="middle">F-BVFA</text><text class="mu-wn" x="1315" y="690" text-anchor="middle">Porte K</text><text class="mu-ws" x="1315" y="708" text-anchor="middle">À bord du Concorde</text><a class="mu-room" data-slug="carte-reseau" style="--w:#1f5fbf" href="carte-reseau.html" aria-label="A1 · Carte animée du réseau"><title>A1 · Carte animée du réseau</title><rect class="mu-roombox" x="123.0" y="330" width="190" height="80" rx="8"/><circle class="mu-badge" cx="145.0" cy="352" r="15"/><text class="mu-c" x="145.0" y="352">A1</text><text class="mu-t" x="167.0" y="361">Carte animée du</text><text class="mu-t" x="167.0" y="379">réseau</text><g class="mu-seen"><circle cx="301" cy="342" r="9"/><path d="M297,342 l3,3 l5,-6"/></g></a><a class="mu-room" data-slug="monde-retrecit" style="--w:#1f5fbf" href="monde-retrecit.html" aria-label="A2 · Le monde rétrécit"><title>A2 · Le monde rétrécit</title><rect class="mu-roombox" x="347.0" y="330" width="190" height="80" rx="8"/><circle class="mu-badge" cx="369.0" cy="352" r="15"/><text class="mu-c" x="369.0" y="352">A2</text><text class="mu-t" x="391.0" y="370">Le monde rétrécit</text><g class="mu-seen"><circle cx="525" cy="342" r="9"/><path d="M521,342 l3,3 l5,-6"/></g></a><a class="mu-room" data-slug="villes-renommees" style="--w:#1f5fbf" href="villes-renommees.html" aria-label="A3 · Villes renommées"><title>A3 · Villes renommées</title><rect class="mu-roombox" x="123.0" y="238" width="190" height="80" rx="8"/><circle class="mu-badge" cx="145.0" cy="260" r="15"/><text class="mu-c" x="145.0" y="260">A3</text><text class="mu-t" x="167.0" y="278">Villes renommées</text><g class="mu-seen"><circle cx="301" cy="250" r="9"/><path d="M297,250 l3,3 l5,-6"/></g></a><a class="mu-room" data-slug="prix-billets" style="--w:#1f5fbf" href="prix-billets.html" aria-label="A4 · Prix des billets"><title>A4 · Prix des billets</title><rect class="mu-roombox" x="347.0" y="238" width="190" height="80" rx="8"/><circle class="mu-badge" cx="369.0" cy="260" r="15"/><text class="mu-c" x="369.0" y="260">A4</text><text class="mu-t" x="391.0" y="278">Prix des billets</text><g class="mu-seen"><circle cx="525" cy="250" r="9"/><path d="M521,250 l3,3 l5,-6"/></g></a><a class="mu-room" data-slug="frise-avions" style="--w:#0f7f7a" href="frise-avions.html" aria-label="B1 · Frise des avions"><title>B1 · Frise des avions</title><rect class="mu-roombox" x="363.0" y="590" width="190" height="80" rx="8"/><circle class="mu-badge" cx="385.0" cy="612" r="15"/><text class="mu-c" x="385.0" y="612">B1</text><text class="mu-t" x="407.0" y="630">Frise des avions</text><g class="mu-seen"><circle cx="541" cy="602" r="9"/><path d="M537,602 l3,3 l5,-6"/></g></a><a class="mu-room" data-slug="vie-avion" style="--w:#0f7f7a" href="vie-avion.html" aria-label="B2 · La vie d&#x27;un avion"><title>B2 · La vie d&#x27;un avion</title><rect class="mu-roombox" x="587.0" y="590" width="190" height="80" rx="8"/><circle class="mu-badge" cx="609.0" cy="612" r="15"/><text class="mu-c" x="609.0" y="612">B2</text><text class="mu-t" x="631.0" y="630">La vie d&#x27;un avion</text><g class="mu-seen"><circle cx="765" cy="602" r="9"/><path d="M761,602 l3,3 l5,-6"/></g></a><a class="mu-room" data-slug="chiffres" style="--w:#0f7f7a" href="chiffres.html" aria-label="B3 · Air France en chiffres"><title>B3 · Air France en chiffres</title><rect class="mu-roombox" x="363.0" y="682" width="190" height="80" rx="8"/><circle class="mu-badge" cx="385.0" cy="704" r="15"/><text class="mu-c" x="385.0" y="704">B3</text><text class="mu-t" x="407.0" y="713">Air France en</text><text class="mu-t" x="407.0" y="731">chiffres</text><g class="mu-seen"><circle cx="541" cy="694" r="9"/><path d="M537,694 l3,3 l5,-6"/></g></a><a class="mu-room" data-slug="ce-jour-la" style="--w:#b35f12" href="ce-jour-la.html" aria-label="C1 · Ce jour-là chez Air France"><title>C1 · Ce jour-là chez Air France</title><rect class="mu-roombox" x="603.0" y="330" width="190" height="80" rx="8"/><circle class="mu-badge" cx="625.0" cy="352" r="15"/><text class="mu-c" x="625.0" y="352">C1</text><text class="mu-t" x="647.0" y="361">Ce jour-là chez</text><text class="mu-t" x="647.0" y="379">Air France</text><g class="mu-seen"><circle cx="781" cy="342" r="9"/><path d="M777,342 l3,3 l5,-6"/></g></a><a class="mu-room" data-slug="personnages-lieux" style="--w:#b35f12" href="personnages-lieux.html" aria-label="C2 · Personnages et lieux"><title>C2 · Personnages et lieux</title><rect class="mu-roombox" x="827.0" y="330" width="190" height="80" rx="8"/><circle class="mu-badge" cx="849.0" cy="352" r="15"/><text class="mu-c" x="849.0" y="352">C2</text><text class="mu-t" x="871.0" y="361">Personnages et</text><text class="mu-t" x="871.0" y="379">lieux</text><g class="mu-seen"><circle cx="1005" cy="342" r="9"/><path d="M1001,342 l3,3 l5,-6"/></g></a><a class="mu-room" data-slug="graphe-personnes" style="--w:#b35f12" href="graphe-personnes.html" aria-label="C3 · Le graphe des personnes"><title>C3 · Le graphe des personnes</title><rect class="mu-roombox" x="603.0" y="238" width="190" height="80" rx="8"/><circle class="mu-badge" cx="625.0" cy="260" r="15"/><text class="mu-c" x="625.0" y="260">C3</text><text class="mu-t" x="647.0" y="269">Le graphe des</text><text class="mu-t" x="647.0" y="287">personnes</text><g class="mu-seen"><circle cx="781" cy="250" r="9"/><path d="M777,250 l3,3 l5,-6"/></g></a><a class="mu-room" data-slug="genealogie" style="--w:#b35f12" href="genealogie.html" aria-label="C4 · Généalogie des compagnies"><title>C4 · Généalogie des compagnies</title><rect class="mu-roombox" x="827.0" y="238" width="190" height="80" rx="8"/><circle class="mu-badge" cx="849.0" cy="260" r="15"/><text class="mu-c" x="849.0" y="260">C4</text><text class="mu-t" x="871.0" y="269">Généalogie des</text><text class="mu-t" x="871.0" y="287">compagnies</text><g class="mu-seen"><circle cx="1005" cy="250" r="9"/><path d="M1001,250 l3,3 l5,-6"/></g></a><a class="mu-room" data-slug="greves-records" style="--w:#c0283a" href="greves-records.html" aria-label="D1 · Grèves et accidents face aux records"><title>D1 · Grèves et accidents face aux records</title><rect class="mu-roombox" x="843.0" y="590" width="190" height="80" rx="8"/><circle class="mu-badge" cx="865.0" cy="612" r="15"/><text class="mu-c" x="865.0" y="612">D1</text><text class="mu-t" x="887.0" y="612">Grèves et</text><text class="mu-t" x="887.0" y="630">accidents face aux</text><text class="mu-t" x="887.0" y="648">records</text><g class="mu-seen"><circle cx="1021" cy="602" r="9"/><path d="M1017,602 l3,3 l5,-6"/></g></a><a class="mu-room" data-slug="barometre-crises" style="--w:#c0283a" href="barometre-crises.html" aria-label="D2 · Baromètre des crises"><title>D2 · Baromètre des crises</title><rect class="mu-roombox" x="1067.0" y="590" width="190" height="80" rx="8"/><circle class="mu-badge" cx="1089.0" cy="612" r="15"/><text class="mu-c" x="1089.0" y="612">D2</text><text class="mu-t" x="1111.0" y="621">Baromètre des</text><text class="mu-t" x="1111.0" y="639">crises</text><g class="mu-seen"><circle cx="1245" cy="602" r="9"/><path d="M1241,602 l3,3 l5,-6"/></g></a><a class="mu-room" data-slug="quiz" style="--w:#6a4cb5" href="quiz.html" aria-label="K1 · Le Grand Quiz"><title>K1 · Le Grand Quiz</title><rect class="mu-cabin" x="1412" y="282" width="16" height="158" rx="6"/><line class="mu-leader" x1="1432" y1="360" x2="1540.0" y2="360"/><rect class="mu-roombox" x="1540.0" y="320" width="190" height="80" rx="8"/><circle class="mu-badge" cx="1562.0" cy="342" r="15"/><text class="mu-c" x="1562.0" y="342">K1</text><text class="mu-t mu-sub" x="1584.0" y="351">Cabine avant</text><text class="mu-t" x="1584.0" y="369">Le Grand Quiz</text><g class="mu-seen"><circle cx="1718" cy="332" r="9"/><path d="M1714,332 l3,3 l5,-6"/></g></a><a class="mu-room" data-slug="devine-annee" style="--w:#6a4cb5" href="devine-annee.html" aria-label="K2 · Devine l&#x27;année"><title>K2 · Devine l&#x27;année</title><rect class="mu-cabin" x="1412" y="439" width="16" height="158" rx="6"/><line class="mu-leader" x1="1432" y1="518" x2="1540.0" y2="518"/><rect class="mu-roombox" x="1540.0" y="478" width="190" height="80" rx="8"/><circle class="mu-badge" cx="1562.0" cy="500" r="15"/><text class="mu-c" x="1562.0" y="500">K2</text><text class="mu-t mu-sub" x="1584.0" y="509">Cabine arrière</text><text class="mu-t" x="1584.0" y="527">Devine l&#x27;année</text><g class="mu-seen"><circle cx="1718" cy="490" r="9"/><path d="M1714,490 l3,3 l5,-6"/></g></a><a class="mu-room" data-slug="demande-musee" style="--w:#b0307a" href="demande-musee.html" aria-label="H1 · Demande au musée"><title>H1 · Demande au musée</title><circle class="mu-roombox" cx="670.0" cy="486" r="30"/><text class="mu-info-i" x="670.0" y="486">i</text><text class="mu-t" x="670.0" y="536" text-anchor="middle">Information : Demande au musée</text><g class="mu-seen"><circle cx="694" cy="462" r="9"/><path d="M690,462 l3,3 l5,-6"/></g></a><g id="mu-me" class="mu-me" transform="translate(124,530)"><circle class="mu-halo" r="18"/><circle class="mu-dot" r="8"/></g></svg>
+    <div class="mu-info" id="mu-info" aria-live="polite"><b>Vous êtes à l'entrée</b><p>Survolez une salle pour lire son cartel, cliquez pour vous y rendre. Le point rouge, c'est vous.</p></div></section>
+  <p class="mu-hint">Dans chaque salle : les portes en bas de page et les flèches ← → du clavier mènent aux salles voisines, la touche P affiche le plan. Les salles visitées sont cochées (mémorisées dans ce navigateur).</p>
+  <section class="mu-board" id="mu-departs"><h2><span>✈</span> DÉPARTS · TOUTES LES SALLES</h2>
+    <table><thead><tr><th>Heure</th><th>Vol</th><th>Salle</th><th>Porte</th><th>Aile</th><th>Statut</th></tr></thead><tbody><tr data-slug="carte-reseau"><td class="mu-flap">09:00</td><td class="mu-flap">MAF 101</td><td class="mu-dest"><a href="carte-reseau.html">Carte animée du réseau</a></td><td><span class="mu-gate" style="--w:#1f5fbf">A1</span></td><td>Le Réseau</td><td><span class="mu-st go">Embarquement</span></td></tr><tr data-slug="monde-retrecit"><td class="mu-flap">09:15</td><td class="mu-flap">MAF 102</td><td class="mu-dest"><a href="monde-retrecit.html">Le monde rétrécit</a></td><td><span class="mu-gate" style="--w:#1f5fbf">A2</span></td><td>Le Réseau</td><td><span class="mu-st go">Embarquement</span></td></tr><tr data-slug="villes-renommees"><td class="mu-flap">09:30</td><td class="mu-flap">MAF 103</td><td class="mu-dest"><a href="villes-renommees.html">Villes renommées</a></td><td><span class="mu-gate" style="--w:#1f5fbf">A3</span></td><td>Le Réseau</td><td><span class="mu-st go">Embarquement</span></td></tr><tr data-slug="prix-billets"><td class="mu-flap">09:45</td><td class="mu-flap">MAF 104</td><td class="mu-dest"><a href="prix-billets.html">Prix des billets</a></td><td><span class="mu-gate" style="--w:#1f5fbf">A4</span></td><td>Le Réseau</td><td><span class="mu-st go">Embarquement</span></td></tr><tr data-slug="frise-avions"><td class="mu-flap">10:00</td><td class="mu-flap">MAF 105</td><td class="mu-dest"><a href="frise-avions.html">Frise des avions</a></td><td><span class="mu-gate" style="--w:#0f7f7a">B1</span></td><td>La Flotte</td><td><span class="mu-st go">Embarquement</span></td></tr><tr data-slug="vie-avion"><td class="mu-flap">10:15</td><td class="mu-flap">MAF 106</td><td class="mu-dest"><a href="vie-avion.html">La vie d&#x27;un avion</a></td><td><span class="mu-gate" style="--w:#0f7f7a">B2</span></td><td>La Flotte</td><td><span class="mu-st go">Embarquement</span></td></tr><tr data-slug="chiffres"><td class="mu-flap">10:30</td><td class="mu-flap">MAF 107</td><td class="mu-dest"><a href="chiffres.html">Air France en chiffres</a></td><td><span class="mu-gate" style="--w:#0f7f7a">B3</span></td><td>La Flotte</td><td><span class="mu-st go">Embarquement</span></td></tr><tr data-slug="ce-jour-la"><td class="mu-flap">10:45</td><td class="mu-flap">MAF 108</td><td class="mu-dest"><a href="ce-jour-la.html">Ce jour-là chez Air France</a></td><td><span class="mu-gate" style="--w:#b35f12">C1</span></td><td>Les Mémoires</td><td><span class="mu-st go">Embarquement</span></td></tr><tr data-slug="personnages-lieux"><td class="mu-flap">11:00</td><td class="mu-flap">MAF 109</td><td class="mu-dest"><a href="personnages-lieux.html">Personnages et lieux</a></td><td><span class="mu-gate" style="--w:#b35f12">C2</span></td><td>Les Mémoires</td><td><span class="mu-st go">Embarquement</span></td></tr><tr data-slug="graphe-personnes"><td class="mu-flap">11:15</td><td class="mu-flap">MAF 110</td><td class="mu-dest"><a href="graphe-personnes.html">Le graphe des personnes</a></td><td><span class="mu-gate" style="--w:#b35f12">C3</span></td><td>Les Mémoires</td><td><span class="mu-st go">Embarquement</span></td></tr><tr data-slug="genealogie"><td class="mu-flap">11:30</td><td class="mu-flap">MAF 111</td><td class="mu-dest"><a href="genealogie.html">Généalogie des compagnies</a></td><td><span class="mu-gate" style="--w:#b35f12">C4</span></td><td>Les Mémoires</td><td><span class="mu-st go">Embarquement</span></td></tr><tr data-slug="greves-records"><td class="mu-flap">11:45</td><td class="mu-flap">MAF 112</td><td class="mu-dest"><a href="greves-records.html">Grèves et accidents face aux records</a></td><td><span class="mu-gate" style="--w:#c0283a">D1</span></td><td>Les Turbulences</td><td><span class="mu-st go">Embarquement</span></td></tr><tr data-slug="barometre-crises"><td class="mu-flap">12:00</td><td class="mu-flap">MAF 113</td><td class="mu-dest"><a href="barometre-crises.html">Baromètre des crises</a></td><td><span class="mu-gate" style="--w:#c0283a">D2</span></td><td>Les Turbulences</td><td><span class="mu-st go">Embarquement</span></td></tr><tr data-slug="quiz"><td class="mu-flap">12:15</td><td class="mu-flap">MAF 114</td><td class="mu-dest"><a href="quiz.html">Le Grand Quiz</a></td><td><span class="mu-gate" style="--w:#6a4cb5">K1</span></td><td>À bord du Concorde</td><td><span class="mu-st go">Embarquement</span></td></tr><tr data-slug="devine-annee"><td class="mu-flap">12:30</td><td class="mu-flap">MAF 115</td><td class="mu-dest"><a href="devine-annee.html">Devine l&#x27;année</a></td><td><span class="mu-gate" style="--w:#6a4cb5">K2</span></td><td>À bord du Concorde</td><td><span class="mu-st go">Embarquement</span></td></tr><tr data-slug="demande-musee"><td class="mu-flap">12:45</td><td class="mu-flap">MAF 116</td><td class="mu-dest"><a href="demande-musee.html">Demande au musée</a></td><td><span class="mu-gate" style="--w:#b0307a">H1</span></td><td>Hall d&#x27;accueil</td><td><span class="mu-st go">Embarquement</span></td></tr></tbody></table></section>
+</main>
+<footer class="mu-foot">Musée Air France · les éphémérides en données</footer><script>
+(() => {
+  const M = {"slug": null, "prev": null, "next": null, "all": ["carte-reseau", "monde-retrecit", "villes-renommees", "prix-billets", "frise-avions", "vie-avion", "chiffres", "ce-jour-la", "personnages-lieux", "graphe-personnes", "genealogie", "greves-records", "barometre-crises", "quiz", "devine-annee", "demande-musee"]}, KEY = "musee-af-visites";
+  let seen = [];
+  try { seen = JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) {}
+  if (M.slug && !seen.includes(M.slug)) { seen.push(M.slug); try { localStorage.setItem(KEY, JSON.stringify(seen)); } catch (e) {} }
+  const done = M.all.filter(s => seen.includes(s));
+  document.querySelectorAll("[data-mu-visits]").forEach(el => el.textContent = `${done.length}/${M.all.length}`);
+  document.querySelectorAll(".mu-plan .mu-room").forEach(a => a.classList.toggle("seen", seen.includes(a.dataset.slug)));
+  document.querySelectorAll(".mu-legend a").forEach(a => a.classList.toggle("mu-done", seen.includes(a.dataset.slug)));
+  window.__museeVisites = seen;
+
+  const dr = document.getElementById("mu-drawer"), btn = document.getElementById("mu-plan-btn");
+  const open = v => { if (!dr) return; dr.hidden = !v; btn.setAttribute("aria-expanded", String(v)); if (v) dr.querySelector(".mu-close").focus(); else btn.focus(); };
+  if (dr) {
+    btn.onclick = () => open(dr.hidden);
+    document.querySelectorAll("[data-mu-plan]").forEach(b => b.onclick = () => open(true));
+    dr.addEventListener("click", e => { if (e.target === dr || e.target.closest(".mu-close")) open(false); });
+  }
+  addEventListener("keydown", e => {
+    if (dr && e.key === "Escape" && !dr.hidden) { open(false); return; }
+    if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+    const t = e.target;
+    if (t.closest && t.closest("input, textarea, select, [contenteditable], [role=slider]")) return;
+    if (e.key === "ArrowLeft" && M.prev) location.href = M.prev;
+    if (e.key === "ArrowRight" && M.next) location.href = M.next;
+    if (dr && (e.key === "p" || e.key === "P")) open(dr.hidden);
+  });
+})();
+</script><script>
+(() => {
+  const R = [{"slug": "carte-reseau", "href": "carte-reseau.html", "code": "A1", "wing": "Jetée A · Le Réseau", "color": "#1f5fbf", "title": "Carte animée du réseau", "desc": "Les lignes ouvertes, suspendues et fermées d'Air France et de ses ancêtres, année après année, sur un planisphère.", "closed": false, "path": [[124, 530], [330, 530], [330, 370], [218, 370]]}, {"slug": "monde-retrecit", "href": "monde-retrecit.html", "code": "A2", "wing": "Jetée A · Le Réseau", "color": "#1f5fbf", "title": "Le monde rétrécit", "desc": "Du Breguet 14 au Boeing 777 et au Concorde : les durées de trajet citées dans les textes, liaison par liaison, et la vitesse moyenne qui en découle.", "closed": false, "path": [[124, 530], [330, 530], [330, 370], [442, 370]]}, {"slug": "villes-renommees", "href": "villes-renommees.html", "code": "A3", "wing": "Jetée A · Le Réseau", "color": "#1f5fbf", "title": "Villes renommées", "desc": "Saïgon, Fort-Lamy, Léopoldville, Bombay… les villes qui ont changé de nom, quand les textes ont basculé du vieux nom au nouveau.", "closed": false, "path": [[124, 530], [330, 530], [330, 278], [218, 278]]}, {"slug": "prix-billets", "href": "prix-billets.html", "code": "A4", "wing": "Jetée A · Le Réseau", "color": "#1f5fbf", "title": "Prix des billets", "desc": "Les tarifs cités dans les éphémérides, en francs puis en euros, ligne par ligne et année par année (de Toulouse-Rabat en 1919 à Paris-New York en 2010).", "closed": false, "path": [[124, 530], [330, 530], [330, 278], [442, 278]]}, {"slug": "frise-avions", "href": "frise-avions.html", "code": "B1", "wing": "Jetée B · La Flotte", "color": "#0f7f7a", "title": "Frise des avions", "desc": "Tous les appareils cités dans les éphémérides, du Farman Goliath à l'A350 : première et dernière mention, année par année.", "closed": false, "path": [[124, 530], [570, 530], [570, 630], [458, 630]]}, {"slug": "vie-avion", "href": "vie-avion.html", "code": "B2", "wing": "Jetée B · La Flotte", "color": "#0f7f7a", "title": "La vie d'un avion", "desc": "Suivre un appareil précis, de F-BPVA (Boeing 747) à F-BVFF (Concorde), par son immatriculation : commande, livraison, mise en service, accident, retrait.", "closed": false, "path": [[124, 530], [570, 530], [570, 630], [682, 630]]}, {"slug": "chiffres", "href": "chiffres.html", "code": "B3", "wing": "Jetée B · La Flotte", "color": "#0f7f7a", "title": "Air France en chiffres", "desc": "Passagers, flotte, effectifs, chiffre d'affaires et résultats de la compagnie puis du groupe Air France-KLM, tels que les éphémérides les citent (de 1946 à 2020).", "closed": false, "path": [[124, 530], [570, 530], [570, 722], [458, 722]]}, {"slug": "ce-jour-la", "href": "ce-jour-la.html", "code": "C1", "wing": "Jetée C · Les Mémoires", "color": "#b35f12", "title": "Ce jour-là chez Air France", "desc": "Choisissez un jour du calendrier (par défaut aujourd'hui) : tous les événements d'Air France arrivés ce jour-là, d'année en année, classés par intérêt.", "closed": false, "path": [[124, 530], [810, 530], [810, 370], [698, 370]]}, {"slug": "personnages-lieux", "href": "personnages-lieux.html", "code": "C2", "wing": "Jetée C · Les Mémoires", "color": "#b35f12", "title": "Personnages et lieux", "desc": "Qui et où : l'index des personnes citées (dirigeants, navigants, politiques…) et des lieux, avec carte, périodes et noms historiques.", "closed": false, "path": [[124, 530], [810, 530], [810, 370], [922, 370]]}, {"slug": "graphe-personnes", "href": "graphe-personnes.html", "code": "C3", "wing": "Jetée C · Les Mémoires", "color": "#b35f12", "title": "Le graphe des personnes", "desc": "Qui apparaît avec qui : le réseau des personnes citées dans un même texte, de Mermoz aux dirigeants d'aujourd'hui.", "closed": false, "path": [[124, 530], [810, 530], [810, 278], [698, 278]]}, {"slug": "genealogie", "href": "genealogie.html", "code": "C4", "wing": "Jetée C · Les Mémoires", "color": "#b35f12", "title": "Généalogie des compagnies", "desc": "De la Compagnie Générale Transaérienne (1909) à Air France-KLM : qui a fusionné, absorbé, créé ou cédé quoi, chaque lien renvoyant au texte qui l'atteste.", "closed": false, "path": [[124, 530], [810, 530], [810, 278], [922, 278]]}, {"slug": "greves-records", "href": "greves-records.html", "code": "D1", "wing": "Jetée D · Les Turbulences", "color": "#c0283a", "title": "Grèves et accidents face aux records", "desc": "Année par année, les textes sur les grèves et les accidents face à ceux sur les records, premiers vols et ouvertures de lignes, avec le ton et le nombre de victimes cité.", "closed": false, "path": [[124, 530], [1050, 530], [1050, 630], [938, 630]]}, {"slug": "barometre-crises", "href": "barometre-crises.html", "code": "D2", "wing": "Jetée D · Les Turbulences", "color": "#c0283a", "title": "Baromètre des crises", "desc": "Année par année, l'intensité des crises chez Air France : guerres et crises, grèves, sécurité et sûreté, pondérée par l'intérêt des textes, avec les événements marquants.", "closed": false, "path": [[124, 530], [1050, 530], [1050, 630], [1162, 630]]}, {"slug": "quiz", "href": "quiz.html", "code": "K1", "wing": "Porte K · À bord du Concorde", "color": "#6a4cb5", "title": "Le Grand Quiz", "desc": "Cinq questions, cinq façons de répondre : cliquer sur la carte, placer une année, estimer un chiffre, remettre dans l'ordre, deviner un mot. Plus vite, plus de points (5 000 max), avec classement.", "closed": false, "path": [[124, 530], [1230, 530], [1230, 470], [1370, 470], [1370, 334], [1420, 334], [1420, 360]]}, {"slug": "devine-annee", "href": "devine-annee.html", "code": "K2", "wing": "Porte K · À bord du Concorde", "color": "#6a4cb5", "title": "Devine l'année", "desc": "Un texte d'archive d'Air France, sans aucune date : en quelle année cela s'est-il passé ? Cinq manches, des points selon l'écart.", "closed": false, "path": [[124, 530], [1230, 530], [1230, 470], [1370, 470], [1370, 334], [1420, 334], [1420, 518]]}, {"slug": "demande-musee", "href": "demande-musee.html", "code": "H1", "wing": "Hall d'accueil · Hall d'accueil", "color": "#b0307a", "title": "Demande au musée", "desc": "Une question, un nom, un lieu, un avion : recherche instantanée dans les 10 000 éphémérides, tolérante aux accents, sans serveur ni IA.", "closed": false, "path": [[124, 530], [670, 530], [670, 512]]}], seen = window.__museeVisites || [];
+  const by = Object.fromEntries(R.map(r => [r.slug, r]));
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // panel describing the room under the pointer
+  const info = document.getElementById("mu-info");
+  const show = r => {
+    info.style.setProperty("--w", r.color);
+    info.innerHTML = `<span class="mu-gate" style="--w:${r.color}">${r.code}</span><small>${esc(r.wing)}</small><b>${esc(r.title)}</b><p>${esc(r.desc)}</p>`
+      + (r.closed ? "<em>Fermée pour travaux</em>" : `<a href="${r.href}">Entrer dans la salle →</a>${seen.includes(r.slug) ? " <small>✓ déjà visitée</small>" : ""}`);
+  };
+  document.querySelectorAll(".mu-plan a.mu-room").forEach(a => {
+    const r = by[a.dataset.slug];
+    a.addEventListener("mouseenter", () => show(r));
+    a.addEventListener("focus", () => show(r));
+  });
+
+  // the visitor walks to the room before entering it
+  const me = document.getElementById("mu-me"), home = me.getAttribute("transform");
+  addEventListener("pageshow", () => me.setAttribute("transform", home));
+  let walking = false;
+  document.querySelector(".mu-planwrap .mu-plan").addEventListener("click", e => {
+    const a = e.target.closest("a.mu-room");
+    if (!a) return;
+    const r = by[a.dataset.slug];
+    if (r.closed) { e.preventDefault(); return; }
+    if (reduce || e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
+    e.preventDefault();
+    if (walking) return;
+    walking = true;
+    const p = r.path, seg = [];
+    let total = 0;
+    for (let i = 1; i < p.length; i++) { const l = Math.hypot(p[i][0] - p[i - 1][0], p[i][1] - p[i - 1][1]); seg.push(l); total += l; }
+    const dur = Math.min(1500, 400 + total * 0.55), t0 = performance.now();
+    setTimeout(() => location.href = r.href, dur + 400);  // in case animation frames are paused
+    const step = now => {
+      let k = Math.min(1, (now - t0) / dur);
+      const d = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+      let rem = d * total, i = 0;
+      while (i < seg.length - 1 && rem > seg[i]) { rem -= seg[i]; i++; }
+      const f = seg[i] ? Math.min(1, rem / seg[i]) : 1;
+      me.setAttribute("transform", `translate(${p[i][0] + (p[i + 1][0] - p[i][0]) * f},${p[i][1] + (p[i + 1][1] - p[i][1]) * f})`);
+      if (k < 1) requestAnimationFrame(step); else { walking = false; location.href = r.href; }
+    };
+    requestAnimationFrame(step);
+  });
+
+  // boarding pass: next room not visited yet
+  const open = R.filter(r => !r.closed), next = open.find(r => !seen.includes(r.slug)) || open[0];
+  if (next) {
+    document.getElementById("mu-next").innerHTML = `<span class="mu-gate" style="--w:${next.color}">${next.code}</span> ${esc(next.title)}`;
+    document.getElementById("mu-go").href = next.href;
+    document.getElementById("mu-go").textContent = seen.length ? "Continuer la visite →" : "Commencer la visite →";
+  }
+  document.querySelectorAll(".mu-stamps i").forEach(i => i.classList.toggle("on", seen.includes(i.dataset.slug)));
+
+  // departures board
+  document.querySelectorAll(".mu-board tbody tr").forEach(tr => {
+    const r = by[tr.dataset.slug], st = tr.querySelector(".mu-st");
+    if (!r.closed && seen.includes(r.slug)) { st.textContent = "Visitée"; st.className = "mu-st done"; }
+    if (!r.closed) tr.onclick = e => { if (!e.target.closest("a")) location.href = r.href; };
+  });
+  if (!reduce) {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    document.querySelectorAll(".mu-flap").forEach((el, n) => {
+      const final = el.textContent, frames = 8 + (n % 9);
+      let f = 0;
+      const id = setInterval(() => {
+        f++;
+        el.textContent = [...final].map((c, i) => c === " " || i < final.length * f / frames ? c : chars[Math.random() * chars.length | 0]).join("");
+        if (f >= frames) { clearInterval(id); el.textContent = final; }
+      }, 40);
+    });
+  }
+})();
+</script></body></html>

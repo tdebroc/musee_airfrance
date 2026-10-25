@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="index,follow">
+<meta http-equiv="Cache-control" content="no-cache">
+<meta http-equiv="Expires" content="-1">
+<link rel="stylesheet" href="https://midpack.airfrance.fr/referentiel/dist/css/bootstrap.css">
+<script src="https://midpack.airfrance.fr/referentiel/js/languages.js"></script>
+<script src="https://midpack.airfrance.fr/referentiel/dist/js/jquery.min.js"></script>
+<script src="https://midpack.airfrance.fr/referentiel/libs/jquery-ui/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://midpack.airfrance.fr/referentiel/libs/jquery-ui/jquery-ui.min.css">
+<script src="https://midpack.airfrance.fr/referentiel/dist/js/bootstrap.min.js"></script>
+<script src="https://midpack.airfrance.fr/referentiel/libs/video-js/video.min.js"></script>
+<link rel="stylesheet" href="https://midpack.airfrance.fr/referentiel/libs/video-js/video-js.min.css">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link rel="stylesheet" href="https://midpack.airfrance.fr/referentiel/css/new_search.css">
+<link rel="stylesheet" href="https://midpack.airfrance.fr/referentiel/dist/font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cmstools.airfrance.fr/cmstoolsWeb/comment.min.css">
+<link rel="stylesheet" href="https://midpack.airfrance.fr/referentiel/css/specificMycms.css">
+<script src="https://midpack.airfrance.fr/referentiel/js/lang.js"></script>
+<script src="https://midpack.airfrance.fr/referentiel/js/nextgen_js/menuFunctions.js"></script>
+<script src="https://midpack.airfrance.fr/referentiel/js/nextgen_js/comTraceurAF_v4.js"></script>
+<script src="https://midpack.airfrance.fr/referentiel/js/nextgen_js/menuHorizontal.js"></script>
+<script src="https://midpack.airfrance.fr/referentiel/js/nextgen_js/footer.js"></script>
+<script src="https://midpack.airfrance.fr/referentiel/js/nextgen_js/menuVertical.js"></script>
+<script src="https://midpack.airfrance.fr/referentiel/js/nextgen_js/listeActus.js"></script>
+<script src="https://midpack.airfrance.fr/referentiel/js/nextgen_js/fullscreenVideoFix.js"></script>
+<script src="https://midpack.airfrance.fr/referentiel/js/nextgen_js/jquery.rwdImageMaps.min.js"></script>
+<script src="https://midpack.airfrance.fr/referentiel/js/nextgen_js/myBox.js"></script>
+<script src="https://midpack.airfrance.fr/referentiel/js/jQueryBootstrapColumnsSameHeight.js"></script>
+<script src="https://midpack.airfrance.fr/referentiel/js/nextgen_js/new_search.js"></script>
+<script src="https://midpack.airfrance.fr/referentiel/js/nextgen_js/fold_to_ascii.js"></script>
+<script src="https://cmstools.airfrance.fr/cmstoolsWeb/js/libs/URI.min.js"></script>
+<script src="https://cmstools.airfrance.fr/cmstoolsWeb/js/libs/handlebars.min-latest.js"></script>
+<script src="https://cmstools.airfrance.fr/cmstoolsWeb/js/app/cmstools.min.js"></script>
+<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="https://midpack.airfrance.fr/referentiel/css/nextgen_specific.css">
+<link rel="icon" type="image/png" href="https://midpack.airfrance.fr/referentiel/dist/img/ico/favicon-airfrance-2018.png">
+<title>Musee - Ephémérides 2022</title>
+<style>
+/* Menu et fil d'Ariane collés en haut de la page pendant le scroll */
+nav.navbar.navbar-flat { position: sticky; top: 0; z-index: 1030; }
+/* Icônes (A+, imprimer...) à droite, sur la ligne du fil d'Ariane */
+#iconsNews { padding-top: 8px; }
+.breadcrumb-sticky { position: sticky; top: var(--navbar-height, 50px); z-index: 1020; background: #fff; }
+/* Les liens d'ancre (#date, #top) ne doivent pas atterrir sous les deux barres */
+html { scroll-padding-top: calc(var(--navbar-height, 50px) + var(--breadcrumb-height, 40px)); }
+/* Frise chronologique à droite : décennies, la décennie en cours est dépliée et l'année en cours est mise en avant */
+#timeline { display: none; }
+@media (min-width: 1280px) {
+	#timeline { display: block; position: fixed; right: 8px; z-index: 1010; text-align: right; font-size: 11px; line-height: 1.5;
+		top: calc(var(--navbar-height, 50px) + var(--breadcrumb-height, 40px) + (100vh - var(--navbar-height, 50px) - var(--breadcrumb-height, 40px)) / 2);
+		transform: translateY(-50%); max-height: calc(100vh - var(--navbar-height, 50px) - var(--breadcrumb-height, 40px) - 24px);
+		overflow-y: auto; scrollbar-width: none; }
+}
+#timeline::-webkit-scrollbar { display: none; }
+#timeline ul { list-style: none; margin: 0; padding: 0; }
+/* Taille et opacité (--tl-size, --tl-opacity) posées en JS selon la distance à l'année en cours : effet de zoom */
+#timeline a { display: block; padding: 1px 4px; color: #00103e; font-size: var(--tl-size, 11px); opacity: var(--tl-opacity, .3); text-decoration: none; transition: opacity .2s, font-size .2s; }
+#timeline a:hover, #timeline a:focus { opacity: 1; text-decoration: none; }
+#timeline .tl-decade > ul { display: none; }
+#timeline .tl-decade.active > ul { display: block; }
+#timeline .tl-decade.active > a, #timeline a.tl-year.active { font-weight: bold; }
+</style>
+</head>
+<body>
+<div class="container my-header">
+    <div class="row">
+        <div class="col-lg-5 col-sm-12 col-lg-offset-7 text-right">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-8">
+            <a href="https://musee.airfrance.fr/musee/fr">
+            <img class="img-responsive" src="https://midpack.airfrance.fr/referentiel/dist/img/Logo_MuseeAF.png" style="max-height: 50px;">
+            </a>
+        </div>
+        <div class="col-sm-4 text-right">
+            <div class="row">
+                <div class="col-xs-12 text-right">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+    </div>
+</div>
+<nav class="navbar navbar-flat">
+    <div class="container">
+        <div class="navbar-header">
+            <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            </button>
+        </div>
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav"></ul>
+        </div>
+    </div>
+</nav>
+<div id="contenu">
+    <div class="ephemeride_22">
+        <div class="container">
+            <div class="row breadcrumb-sticky">
+                <div class="col-xs-8">
+                    <ol class="breadcrumb"></ol>
+                </div>
+                <div id="iconsNews" class="col-xs-4 text-right">
+                    <a id="changeFontSize" href="#iconsNews" title="Changez la taille de la police de caractères">
+                    <span class="color-nightblue"><strong>A+</strong></span>
+                    </a>
+                    <a id="printArticle" href="#iconsNews" title="Imprimez l'article">
+                    <span class="icon-af icon-af-B-digital-imprimante color-nightblue"></span>
+                    </a>
+                    <a id="shareYammer" href="#" title="Partagez cet article sur Yammer">
+                    <span class="icon-af icon-af-D-sn-yammer color-nightblue"></span>
+                    </a>
+                    <a id="mailTo" href="#"  title="Envoyez cet article par email">
+                    <span class="icon-af icon-af-B-digital-enveloppe color-nightblue"></span>
+                    </a>
+                </div>
+            </div>
+            <div class="">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="title">
+                            <h2>Ephémérides</h2>
+                        </div>
+
+                        {{BODY_TO_INSERT}}
+
+                        <div class="row">
+                            <div class="col-lg-12 text-right">
+                                <a href="#top"><span class="icon-af icon-af-A-basic-chevron-up"></span> retour haut de page</a>
+                            </div>
+                        </div>
+                        <br/>
+                    </div>
+                </div>
+            </div>
+            <div id="CMSTOOLS_comment"></div>
+        </div>
+    </div>
+    <footer>
+    </footer>
+</div>
+<nav id="timeline" aria-label="Chronologie"><ul></ul></nav>
+<script>
+var lesMenusV = [];
+var nbMenusV = 0;
+var iMenusV = 0;
+var menusVParcourus = [];
+var liensParcourus = [];
+var entreeTrouve = false;
+var homePage = 'HomePage.html';
+var docRoot = 'musee';
+var lang = 'fr';
+$(document).ready(function($) {
+	makeHorizontalMenu('/musee/fr/menuHorizontal/menuh.json');
+	makeFooter('/musee/fr/footer/contextual_link.json');
+	makeFooterColonne('/musee/fr/footer/footer.json') ;
+ $('video').on('contextmenu',function(e) {
+ e.preventDefault();
+ });
+	if(nbMyBoxes > 0) makeMyBoxTable(myBoxesConfigs[nbMyBoxes-1].URI);
+	$('img[usemap]').rwdImageMaps();
+	$('.same-height').columnsSameHeight({workOnColumnWrapper: true});
+	
+	var env = 'prd';
+	var baseUrl = (window.location.host + "/musee").replace(/\/$/,"");
+	var pageUrl = window.location.href.replace(/https?:\/\//,"").replace(baseUrl,"").replace(window.location.hash,"");
+	var zoom = 0;
+	var wrapperNews = $("#wrapperNews");
+	if (wrapperNews.length == 0) { var wrapperNews = $(".row:not(#viewsIcons)")};
+	$("#changeFontSize").on("click", function() {
+		zoom++;
+		wrapperNews.css("font-size", "1." + (zoom * 25) + "em");
+		if (zoom===3)
+		zoom = -1;
+	});
+	$("#printArticle").on("click", function() {
+		window.print();
+	});
+	var urlPage = window.location.href;
+	$("#shareYammer").attr("href", "javascript:void(window.open('https://www.yammer.com/messages/new?login=true&status=" + urlPage + "', 'shareWindow', 'width=575, height=550, top=150, left=50'));");
+	var txtMailTo = "Je%20vous%20recommande%20cette%20page%20:%20"; // Version française du body du mailTo
+	if (lang === "en")
+		txtMailTo = "I%20recommend%20this%20page:%20"; // Version anglaise du body du mailTo
+	$("#mailTo").attr("href", "mailto:?subject=" + encodeURIComponent("Eph\u00E9m\u00E9rides 2022") + "&body=" + txtMailTo + encodeURIComponent(urlPage));
+});
+</script>
+<script>
+// Cette page est dans /musee/files/ (pas de /fr/) : getPage() renvoie alors l'URL complète pour le lien du menu
+// mais seulement le chemin pour la page courante, et le fil d'Ariane / l'élément actif du menu ne sont pas trouvés.
+// On retire le domaine pour que les deux soient comparés sur le chemin.
+(function() {
+	var originalGetPage = getPage;
+	getPage = function(lien) {
+		return originalGetPage(lien.replace(/^https?:\/\/[^\/]+/i, ''));
+	};
+})();
+</script>
+<script>
+// Hauteurs du menu et du fil d'Ariane (variables CSS utilisées par le sticky). Le menu est construit en JS après le
+// chargement et change de hauteur en mobile : on observe les deux éléments plutôt que de mesurer une seule fois.
+(function() {
+	var nav = document.querySelector('nav.navbar-flat');
+	var breadcrumb = document.querySelector('.breadcrumb-sticky');
+	function update() {
+		var root = document.documentElement.style;
+		root.setProperty('--navbar-height', nav.offsetHeight + 'px');
+		root.setProperty('--breadcrumb-height', breadcrumb.offsetHeight + 'px');
+	}
+	update();
+	if (window.ResizeObserver) {
+		var observer = new ResizeObserver(update);
+		observer.observe(nav);
+		observer.observe(breadcrumb);
+	} else {
+		window.addEventListener('resize', update);
+		window.addEventListener('load', update);
+	}
+})();
+</script>
+<script>
+// Frise chronologique : construite à partir des entrées <div class="title" id="annee_AAAA"> (première entrée de chaque année,
+// la page est triée de la plus récente à la plus ancienne). L'année affichée = la dernière entrée-année passée sous les barres collées.
+(function() {
+	var timeline = document.getElementById('timeline');
+	var starts = document.querySelectorAll('.title[id^="annee_"]');
+	if (!timeline || !starts.length) return;
+
+	var list = timeline.firstElementChild;
+	var decades = {};
+	var years = [];
+	Array.prototype.forEach.call(starts, function(start) {
+		var year = parseInt(start.id.slice(6), 10);
+		var decade = Math.floor(year / 10) * 10;
+		if (!decades[decade]) {
+			var item = document.createElement('li');
+			item.className = 'tl-decade';
+			item.innerHTML = '<a href="#' + start.id + '">' + decade + 's</a><ul></ul>';
+			list.appendChild(item);
+			decades[decade] = item;
+		}
+		var li = document.createElement('li');
+		li.innerHTML = '<a class="tl-year" href="#' + start.id + '">' + year + '</a>';
+		decades[decade].lastElementChild.appendChild(li);
+		years.push({ start: start, link: li.firstChild, decade: decades[decade], top: 0 });
+	});
+
+	function measure() {
+		var scrollY = window.pageYOffset;
+		years.forEach(function(y) { y.top = y.start.getBoundingClientRect().top + scrollY; });
+		update();
+	}
+
+	var current = null;
+	function update() {
+		var root = getComputedStyle(document.documentElement);
+		var offset = (parseFloat(root.getPropertyValue('--navbar-height')) || 50) + (parseFloat(root.getPropertyValue('--breadcrumb-height')) || 40) + 10;
+		var line = window.pageYOffset + offset;
+		var found = years[0];
+		for (var i = 0; i < years.length && years[i].top <= line; i++) found = years[i];
+		if (found === current) return;
+		if (current) {
+			current.link.classList.remove('active');
+			current.decade.classList.remove('active');
+		}
+		current = found;
+		current.link.classList.add('active');
+		current.decade.classList.add('active');
+		// Zoom : plus une ligne est loin de l'année en cours (en nombre de lignes visibles), plus elle est petite et transparente
+		var rows = timeline.querySelectorAll('.tl-decade > a, .tl-decade.active a.tl-year');
+		var center = Array.prototype.indexOf.call(rows, current.link);
+		Array.prototype.forEach.call(rows, function(row, i) {
+			var d = i - center;
+			row.style.setProperty('--tl-size', (10 + 12 * Math.exp(-d * d / 8)).toFixed(1) + 'px');
+			row.style.setProperty('--tl-opacity', (0.25 + 0.75 * Math.exp(-d * d / 18)).toFixed(2));
+		});
+		// Garde l'année active visible si la frise déborde (sans faire défiler la page)
+		var linkTop = current.link.offsetTop, linkBottom = linkTop + current.link.offsetHeight;
+		if (linkTop < timeline.scrollTop) timeline.scrollTop = linkTop;
+		else if (linkBottom > timeline.scrollTop + timeline.clientHeight) timeline.scrollTop = linkBottom - timeline.clientHeight;
+	}
+
+	var ticking = false;
+	window.addEventListener('scroll', function() {
+		if (ticking) return;
+		ticking = true;
+		requestAnimationFrame(function() { ticking = false; update(); });
+	}, { passive: true });
+	window.addEventListener('resize', measure);
+	window.addEventListener('load', measure);
+	// Le menu est construit en JS après le chargement : la mise en page peut bouger
+	if (window.ResizeObserver) new ResizeObserver(measure).observe(document.body);
+	measure();
+})();
+</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5PG0PBVGHY"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-5PG0PBVGHY');
+</script>
+</body>
+</html>
